@@ -4,30 +4,56 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"strings"
+
+	//"strings"
+
+	"flag"
+
+	"github.com/ahsar/cli-chat/internal/chat"
+	"github.com/ahsar/cli-chat/internal/logger"
 )
 
+// verbose 模式
+var v bool
+
+func Init() {
+	flag.BoolVar(&v, "v", false, "verbose 模式")
+	flag.Parse()
+
+	level := "info"
+	if v {
+		level = "debug"
+	}
+	logger.Init(level)
+}
+
 func Run() {
+	scanner := bufio.NewScanner(os.Stdin)
 
-	ch := make(chan string)
+	fmt.Print("> ")
+	for scanner.Scan() {
+		line := scanner.Text()
 
-	go readCmd(ch)
+		if line == "^D" {
+			fmt.Println("Exiting program...")
+			break
+		}
 
-	for str := range ch {
-		delCmd(str)
+		extractCmd(line)
+		fmt.Print("> ")
 	}
 }
 
-func readCmd(ch chan string) {
-	for {
-		reader := bufio.NewReader(os.Stdin)
-		name, _ := reader.ReadString('\n')
-		name = strings.TrimSpace(name)
-		fmt.Println("run in---")
-		ch <- name
-	}
-}
+// extract cmd
+func extractCmd(s string) {
+	fmt.Println("now receive cmd:", s)
 
-func delCmd(str string) {
-	fmt.Println("your enter is:", str)
+	switch s {
+	case "login":
+		chat.Run()
+	case "friends":
+		chat.Friends()
+	case "groups":
+		chat.Groups()
+	}
 }
