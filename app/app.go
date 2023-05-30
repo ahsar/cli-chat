@@ -56,4 +56,7 @@ func extractCmd(s string) {
 	case "groups":
 		chat.Groups()
 	}
+	//if strings.HasPrefix(s, "talk:") {
+	//chat.Talk(s)
+	//}
 }
