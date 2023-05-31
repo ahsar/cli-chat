@@ -1,16 +1,10 @@
 package app
 
 import (
-	"bufio"
-	"fmt"
-	"os"
-
-	//"strings"
-
 	"flag"
 
-	"github.com/ahsar/cli-chat/internal/chat"
 	"github.com/ahsar/cli-chat/internal/logger"
+	"github.com/ahsar/cli-chat/internal/ui"
 )
 
 // verbose 模式
@@ -28,35 +22,14 @@ func Init() {
 }
 
 func Run() {
-	scanner := bufio.NewScanner(os.Stdin)
+	// 登录
+	//chat.Login()
 
-	fmt.Print("> ")
-	for scanner.Scan() {
-		line := scanner.Text()
-
-		if line == "^D" {
-			fmt.Println("Exiting program...")
-			break
-		}
-
-		extractCmd(line)
-		fmt.Print("> ")
-	}
-}
-
-// extract cmd
-func extractCmd(s string) {
-	fmt.Println("now receive cmd:", s)
-
-	switch s {
-	case "login":
-		chat.Run()
-	case "friends":
-		chat.Friends()
-	case "groups":
-		chat.Groups()
-	}
-	//if strings.HasPrefix(s, "talk:") {
-	//chat.Talk(s)
-	//}
+	// 获取通讯录(friends)
+	//frList := chat.Friends()
+	frList := "id1 user1\nid2 user2"
+	page := ui.New()
+	page.SetContacts(frList)
+	page.Run()
+	page.G.Close()
 }
