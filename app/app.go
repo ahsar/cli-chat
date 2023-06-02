@@ -3,8 +3,12 @@ package app
 import (
 	"flag"
 
+	"fmt"
+	"os"
+
 	"github.com/ahsar/cli-chat/internal/logger"
 	"github.com/ahsar/cli-chat/internal/ui"
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 // verbose 模式
@@ -27,9 +31,10 @@ func Run() {
 
 	// 获取通讯录(friends)
 	//frList := chat.Friends()
-	frList := "id1 user1\nid2 user2"
-	page := ui.New()
-	page.SetContacts(frList)
-	page.Run()
-	page.G.Close()
+	//frList := "id1 user1\nid2 user2"
+
+	if _, err := tea.NewProgram(ui.NewModel(), tea.WithAltScreen()).Run(); err != nil {
+		fmt.Println("Error while running program:", err)
+		os.Exit(1)
+	}
 }

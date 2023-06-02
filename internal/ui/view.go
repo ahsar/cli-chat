@@ -1,131 +1,79 @@
 package ui
 
 import (
-	"fmt"
+	"strconv"
 
-	"github.com/jroimartin/gocui"
+	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/bubbles/textarea"
+	"github.com/charmbracelet/lipgloss"
 )
 
-var active = 0
+var (
+	cursorStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("212"))
 
-func setView(g *gocui.Gui) (err error) {
-	var v *gocui.View
+	cursorLineStyle = lipgloss.NewStyle().
+			Background(lipgloss.Color("57")).
+			Foreground(lipgloss.Color("230"))
 
-	// 最近联系的人
-	if v, err = g.SetView(wx_view, 0, 0, MaxX/5-1, MaxY-1); err != nil {
-		if err != gocui.ErrUnknownView {
-			return err
+	placeholderStyle = lipgloss.NewStyle().
+				Foreground(lipgloss.Color("238"))
+
+	endOfBufferStyle = lipgloss.NewStyle().
+				Foreground(lipgloss.Color("235"))
+
+	focusedPlaceholderStyle = lipgloss.NewStyle().
+				Foreground(lipgloss.Color("99"))
+
+	focusedBorderStyle = lipgloss.NewStyle().
+				Border(lipgloss.ThickBorder()).
+				BorderForeground(lipgloss.Color("238"))
+
+	blurredBorderStyle = lipgloss.NewStyle().
+				Border(lipgloss.NormalBorder())
+)
+
+func (m model) sizeInput() {
+	l := len(m.inputs)
+	for i := range m.inputs {
+
+		switch i {
+		// 最近联系人
+		case 0:
+			m.inputs[i].SetWidth(m.width / l)
+			m.inputs[i].SetHeight(m.height - helpHeight - 2)
+		// 聊天窗口
+		case 1:
+			m.inputs[i].SetWidth(m.width / l)
+			m.inputs[i].SetHeight(m.height/2 - helpHeight - 2)
+		// 对话框
+		case 2:
+			m.inputs[i].SetWidth(m.width / l)
+			m.inputs[i].SetHeight(m.height/2 - helpHeight - 1)
+		// 通讯录
+		case 3:
+			m.inputs[i].SetWidth(m.width / l)
+			m.inputs[i].SetHeight(m.height - helpHeight)
 		}
-		v.Title = "recent"
-		v.Editable = true
-		v.Autoscroll = true
 	}
-
-	// 对话框
-	if v, err = g.SetView(msg_view, MaxX/5, 0, MaxX*2/3-1, MaxY/2+3); err != nil {
-		if err != gocui.ErrUnknownView {
-			return err
-		}
-		v.Title = "Message(nickname%s)"
-		v.Autoscroll = true
-		//v.Editable = true
-	}
-
-	// 聊天输入框
-	if v, err = g.SetView(talk_view, MaxX/5, MaxY/2+4, MaxX*2/3-1, MaxY-1); err != nil {
-		if err != gocui.ErrUnknownView {
-			return err
-		}
-		v.Title = "Msg"
-		v.Editable = true
-		if _, err := setCurrentViewOnTop(g, talk_view); err != nil {
-			fmt.Println("set cur err", err)
-			return err
-		}
-	}
-
-	return
 }
 
-func (g *OutPut) SetContacts(friends string) (err error) {
-	// 通讯录
-	if v, err := g.G.SetView(contacts_view, MaxX*2/3, 0, MaxX-6, MaxY-1); err != nil {
-		if err != gocui.ErrUnknownView {
-			return err
-		}
-		v.BgColor = 129
-		v.Title = "contacts"
-		v.Wrap = true
-		setCurrentViewOnTop(g.G, contacts_view)
-
-		fmt.Fprintln(v, friends)
-	}
-	return
-}
-
-func setCurrentViewOnTop(g *gocui.Gui, name string) (*gocui.View, error) {
-	if _, err := g.SetCurrentView(name); err != nil {
-		return nil, err
-	}
-	return g.SetViewOnTop(name)
-}
-
-func nextView(g *gocui.Gui, v *gocui.View) error {
-	nextIndex := (active + 1) % len(viewArr)
-	name := viewArr[nextIndex]
-
-	//out, _ := g.View(msg_view)
-	//fmt.Fprintf(out, "gui pointer %p ", g)
-	//fmt.Fprintln(out, "from", active, v.Name(), "to", nextIndex, name)
-	if _, err := setCurrentViewOnTop(g, name); err != nil {
-		fmt.Println("set cur err", err)
-		return err
-	}
-
-	active = nextIndex
-	return nil
-}
-
-func cursorDown(g *gocui.Gui, v *gocui.View) error {
-	if v != nil {
-		cx, cy := v.Cursor()
-		if err := v.SetCursor(cx, cy+1); err != nil {
-			ox, oy := v.Origin()
-			if err := v.SetOrigin(ox, oy+1); err != nil {
-				return err
-			}
-		}
-	}
-	return nil
-}
-
-func cursorUp(g *gocui.Gui, v *gocui.View) error {
-	if v != nil {
-		ox, oy := v.Origin()
-		cx, cy := v.Cursor()
-		if err := v.SetCursor(cx, cy-1); err != nil && oy > 0 {
-			if err := v.SetOrigin(ox, oy-1); err != nil {
-				return err
-			}
-		}
-	}
-	return nil
-}
-
-func selectUser(g *gocui.Gui, v *gocui.View) (err error) {
-	_, row := v.Cursor()
-
-	var l string
-	if l, err = v.Line(row); err != nil {
-		l = ""
-	}
-
-	// todo show recent
-	//v.Clear()
-	out, err := g.View(msg_view)
-	out.Clear()
-	fmt.Fprintf(out, "#TODO %s 聊天记录\n", l)
-
-	setCurrentViewOnTop(g, talk_view)
-	return
+func newTextarea(i int) textarea.Model {
+	t := textarea.New()
+	t.Prompt = ""
+	//t.Placeholder = "Type something"
+	t.ShowLineNumbers = false
+	t.Cursor.Style = cursorStyle
+	t.FocusedStyle.Placeholder = focusedPlaceholderStyle
+	t.BlurredStyle.Placeholder = placeholderStyle
+	t.FocusedStyle.CursorLine = cursorLineStyle
+	t.FocusedStyle.Base = focusedBorderStyle
+	t.BlurredStyle.Base = blurredBorderStyle
+	t.FocusedStyle.EndOfBuffer = endOfBufferStyle
+	t.BlurredStyle.EndOfBuffer = endOfBufferStyle
+	//t.KeyMap.DeleteWordBackward.SetEnabled(false)
+	t.KeyMap.LineNext = key.NewBinding(key.WithKeys("down"))
+	t.KeyMap.LinePrevious = key.NewBinding(key.WithKeys("up"))
+	t.Blur()
+	t.SetValue("\n\n\n" + strconv.Itoa(i+1))
+	return t
 }
