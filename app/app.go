@@ -33,7 +33,8 @@ func Run() {
 	//frList := chat.Friends()
 	//frList := "id1 user1\nid2 user2"
 
-	if _, err := tea.NewProgram(ui.NewModel(), tea.WithAltScreen()).Run(); err != nil {
+	if _, err := tea.NewProgram(
+		ui.NewModel(), tea.WithAltScreen()).Run(); err != nil {
 		fmt.Println("Error while running program:", err)
 		os.Exit(1)
 	}

@@ -1,12 +1,16 @@
 package ui
 
 import (
-	//"bytes"
+	"bytes"
 	//"fmt"
 
 	"fmt"
 	//"os"
 
+	"github.com/ahsar/cli-chat/internal/ui/components/contacts"
+	"github.com/ahsar/cli-chat/internal/ui/components/dialog"
+	"github.com/ahsar/cli-chat/internal/ui/components/message"
+	"github.com/ahsar/cli-chat/internal/ui/components/rencent"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textarea"
@@ -27,12 +31,16 @@ type keymap struct {
 }
 
 type model struct {
-	width  int
-	height int
-	keymap keymap
-	help   help.Model
-	inputs []textarea.Model
-	focus  int
+	rencent  rencent.Model
+	contacts contacts.Model
+	dialog   dialog.Model
+	message  message.Model
+	width    int
+	height   int
+	keymap   keymap
+	help     help.Model
+	inputs   []textarea.Model
+	focus    int
 }
 
 func NewModel() (m model) {
@@ -130,38 +138,15 @@ func (m model) View() (s string) {
 		m.keymap.quit,
 	})
 
-	//var buff bytes.Buffer
-	var views = make([]string, 0, 2)
-	//for i := range m.inputs {
-	//views = append(views, m.inputs[i].View())
+	var buff bytes.Buffer
 
-	//switch i {
-	//case 0:
-	//fmt.Println(1)
-	//buff.WriteString(lipgloss.JoinHorizontal(lipgloss.Bottom, m.inputs[i].View()))
-	//case 1:
-	//fmt.Println(2)
-	//buff.WriteString(lipgloss.JoinHorizontal(lipgloss.Bottom, m.inputs[i].View()))
-	//case 2:
-	//fmt.Println(3)
-	//buff.WriteString(lipgloss.JoinVertical(lipgloss.Bottom, m.inputs[i].View()))
-	//case 3:
-	//fmt.Println(4)
-	//buff.WriteString(lipgloss.JoinHorizontal(lipgloss.Right, m.inputs[i].View()))
-	//}
-	//}
+	buff.WriteString(
+		lipgloss.NewStyle().
+			Border(lipgloss.NormalBorder()).
+			Render(m.rencent.View()))
 
-	//lip
-	//fmt.Println(buff.String())
-	//os.Exit(1)
-	//buff.WriteString("\n\n" + help)
+	buff.WriteString("\n\n" + help)
 
-	views = append(views, m.inputs[0].View(), m.inputs[1].View())
-	s = lipgloss.JoinHorizontal(lipgloss.Top, views...) + "\n\n" + help
-	//lipgloss.JoinVertical(lipgloss.Right, []string{m.inputs[2].View()}...) + "\n\n" +
-	//lipgloss.JoinHorizontal(lipgloss.Right, []string{m.inputs[3].View()}...) + "\n\n" + help
 	fmt.Println(s)
-	//os.Exit(1)
 	return s
-	//return buff.String()
 }
