@@ -24,9 +24,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return nil, tea.Batch([]tea.Cmd{}...)
 }
 
-func (m Model) View() (s string) {
+func (m *Model) View() (s string) {
 	t := textarea.New()
 	t.Prompt = ""
+	//t.ShowLineNumbers = false
 	t.Cursor.Style = constant.CursorStyle
 	t.FocusedStyle.Placeholder = constant.FocusedPlaceholderStyle
 	t.BlurredStyle.Placeholder = constant.PlaceholderStyle
@@ -38,18 +39,23 @@ func (m Model) View() (s string) {
 	t.KeyMap.LineNext = key.NewBinding(key.WithKeys("down"))
 	t.KeyMap.LinePrevious = key.NewBinding(key.WithKeys("up"))
 	t.Blur()
+	t.SetHeight(10)
 
-	return lipgloss.NewStyle().
-		BorderTop(true).
-		BorderStyle(lipgloss.NormalBorder()).
-		//BorderForeground(m.ctx.Theme.SecondaryBorder).
-		MarginTop(1).
-		Render(
-			lipgloss.JoinVertical(
-				lipgloss.Left,
-				lipgloss.NewStyle().
-					MarginTop(1).
-					Render(t.View()),
-			),
-		)
+	return lipgloss.JoinHorizontal(
+		lipgloss.Left,
+		//t.View(),
+		t.View(),
+	)
+	//return lipgloss.NewStyle().
+	////BorderTop(true).
+	//BorderStyle(lipgloss.NormalBorder()).
+	////MarginTop(1).
+	//Render(
+	////lipgloss.JoinHorizontal(
+	////lipgloss.Left,
+	////t.View(),
+	////t.View(),
+	////),
+	//"\n\n",
+	//)
 }
