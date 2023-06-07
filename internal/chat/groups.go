@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/ahsar/cli-chat/internal/logger"
+	"log"
+
 	"github.com/liushuochen/gotable"
 )
 
@@ -12,7 +13,7 @@ func Groups() {
 	// 获取所有的群组
 	groups, err := self.Groups()
 	if err != nil {
-		logger.Fatal("获取群组列表失败 %+v", err)
+		log.Fatal("获取群组列表失败", err)
 		return
 	}
 

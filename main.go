@@ -32,6 +32,5 @@ func main() {
 	}()
 
 	fmt.Println("Welcome to use cli-chat")
-	app.Init()
 	app.Run()
 }

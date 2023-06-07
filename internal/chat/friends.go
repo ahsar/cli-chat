@@ -6,7 +6,7 @@ import (
 
 	"github.com/eatmoreapple/openwechat"
 
-	"github.com/ahsar/cli-chat/internal/logger"
+	"log"
 )
 
 var FriendsMap map[int]*openwechat.Friend
@@ -16,7 +16,7 @@ var FriendsMap map[int]*openwechat.Friend
 func Friends() (s string) {
 	friends, err := self.Friends()
 	if err != nil {
-		logger.Fatal("获取好友列表失败 %+v", err)
+		log.Fatal("获取好友列表失败", err)
 		return
 	}
 

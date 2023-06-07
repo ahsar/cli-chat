@@ -140,9 +140,9 @@ func (m model) View() string {
 	buff.WriteString(
 		lipgloss.NewStyle().
 			Border(lipgloss.NormalBorder()).
-			AlignHorizontal(lipgloss.Right).
+			AlignVertical(lipgloss.Center).
 			Render(
-				"\n",
+				"\n\n",
 				m.rencent.View(),
 				m.message.View(),
 			))
