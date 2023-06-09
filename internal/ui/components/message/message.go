@@ -27,7 +27,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m Model) View() (s string) {
 	t := textarea.New()
 	t.Prompt = ""
-	t.SetValue("1212")
+	t.SetValue("11212")
 	//t.ShowLineNumbers = false
 	t.Cursor.Style = constant.CursorStyle
 	t.FocusedStyle.Placeholder = constant.FocusedPlaceholderStyle
@@ -51,10 +51,9 @@ func (m Model) View() (s string) {
 	//Render(t.View()),
 	//),
 	//)
+
 	return lipgloss.JoinVertical(
-		lipgloss.Left,
-		"\n",
-		//lipgloss.Right,
+		lipgloss.Top,
 		t.View(),
 		t.View(),
 	)
