@@ -2,6 +2,7 @@
 package message
 
 import (
+	"github.com/ahsar/cli-chat/internal/ui/components/dialog"
 	"github.com/ahsar/cli-chat/internal/ui/constant"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textarea"
@@ -10,6 +11,7 @@ import (
 )
 
 type Model struct {
+	dialog dialog.Model
 }
 
 func NewModel() Model {
@@ -28,7 +30,7 @@ func (m Model) View() (s string) {
 	t := textarea.New()
 	t.Prompt = ""
 	t.SetValue("11212")
-	//t.ShowLineNumbers = false
+	t.ShowLineNumbers = true
 	t.Cursor.Style = constant.CursorStyle
 	t.FocusedStyle.Placeholder = constant.FocusedPlaceholderStyle
 	t.BlurredStyle.Placeholder = constant.PlaceholderStyle
@@ -39,22 +41,13 @@ func (m Model) View() (s string) {
 	t.BlurredStyle.EndOfBuffer = constant.EndOfBufferStyle
 	t.KeyMap.LineNext = key.NewBinding(key.WithKeys("down"))
 	t.KeyMap.LinePrevious = key.NewBinding(key.WithKeys("up"))
+	t.SetHeight(7)
 	t.Blur()
-
-	//return lipgloss.NewStyle().
-	//BorderStyle(lipgloss.NormalBorder()).
-	//MarginTop(1).
-	//Render(
-	//lipgloss.JoinVertical(
-	//lipgloss.Left,
-	//lipgloss.NewStyle().
-	//Render(t.View()),
-	//),
-	//)
 
 	return lipgloss.JoinVertical(
 		lipgloss.Top,
 		t.View(),
 		t.View(),
+		//m.dialog.View(),
 	)
 }

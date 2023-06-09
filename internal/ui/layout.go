@@ -7,19 +7,14 @@ import (
 	"github.com/ahsar/cli-chat/internal/ui/components/dialog"
 	"github.com/ahsar/cli-chat/internal/ui/components/message"
 	"github.com/ahsar/cli-chat/internal/ui/components/rencent"
-	"github.com/ahsar/cli-chat/internal/ui/constant"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
-	"github.com/charmbracelet/bubbles/table"
 	"github.com/charmbracelet/bubbles/textarea"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 
 const (
-	// 面板数量
-	panelsNum = 4
-
 	// 帮助栏高度
 	helpHeight = 1
 )
@@ -37,14 +32,12 @@ type model struct {
 	height   int
 	keymap   keymap
 	help     help.Model
-	inputs   []textarea.Model
 	focus    int
 }
 
 func NewModel() (m model) {
 	m = model{
-		inputs: make([]textarea.Model, panelsNum),
-		help:   help.New(),
+		help: help.New(),
 		keymap: keymap{
 			next: key.NewBinding(
 				key.WithKeys("tab"),
@@ -62,11 +55,6 @@ func NewModel() (m model) {
 		focus: 3, // 默认通讯录高亮
 	}
 
-	for i := 0; i < panelsNum; i++ {
-		m.inputs[i] = newTextarea(i)
-	}
-
-	//m.inputs[m.focus].Focus()
 	//m.updateKeybindings()
 	return
 }
@@ -82,24 +70,17 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, m.keymap.quit):
-			for i := range m.inputs {
-				m.inputs[i].Blur()
-			}
+			//todo blur
 			return m, tea.Quit
 		case key.Matches(msg, m.keymap.next):
-			m.inputs[m.focus].Blur()
-			m.focus++
-			if m.focus > len(m.inputs)-1 {
-				m.focus = 0
-			}
-			//cmd := m.inputs[m.focus].Focus()
-			//cmds = append(cmds, cmd)
+			// todo focus
+			m.contacts.Focus()
 		case key.Matches(msg, m.keymap.prev):
-			m.inputs[m.focus].Blur()
-			m.focus--
-			if m.focus < 0 {
-				m.focus = len(m.inputs) - 1
-			}
+			//m.inputs[m.focus].Blur()
+			//m.focus--
+			//if m.focus < 0 {
+			//m.focus = len(m.inputs) - 1
+			//}
 			//cmd := m.inputs[m.focus].Focus()
 			//cmds = append(cmds, cmd)
 			//case key.Matches(msg, m.keymap.add):
@@ -125,61 +106,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	//cmds = append(cmds, cmd)
 	//}
 
+	// TODO update helpHeight
 	return m, tea.Batch(cmds...)
-}
-
-func getTable() (t table.Model) {
-	columns := []table.Column{
-		{Title: "Rank", Width: 4},
-		{Title: "City", Width: 10},
-		{Title: "Country", Width: 10},
-		{Title: "Population", Width: 10},
-	}
-
-	rows := []table.Row{
-		{"1", "Tokyo", "Japan", "37,274,000"},
-		{"2", "Delhi", "India", "32,065,760"},
-	}
-
-	t = table.New(
-		table.WithColumns(columns),
-		table.WithRows(rows),
-		table.WithFocused(true),
-		table.WithHeight(7),
-	)
-
-	s := table.DefaultStyles()
-	s.Header = s.Header.
-		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color("240")).
-		BorderBottom(true).
-		Bold(false)
-	s.Selected = s.Selected.
-		Foreground(lipgloss.Color("229")).
-		Background(lipgloss.Color("57")).
-		Bold(false)
-	t.SetStyles(s)
-	return
-}
-
-func textA(i int) (t textarea.Model) {
-	t = textarea.New()
-	t.SetHeight(i)
-	t.Prompt = ""
-	t.SetValue("1212")
-	//t.ShowLineNumbers = false
-	t.Cursor.Style = constant.CursorStyle
-	t.FocusedStyle.Placeholder = constant.FocusedPlaceholderStyle
-	t.BlurredStyle.Placeholder = constant.PlaceholderStyle
-	t.FocusedStyle.CursorLine = constant.CursorLineStyle
-	t.FocusedStyle.Base = constant.FocusedBorderStyle
-	t.BlurredStyle.Base = constant.BlurredBorderStyle
-	t.FocusedStyle.EndOfBuffer = constant.EndOfBufferStyle
-	t.BlurredStyle.EndOfBuffer = constant.EndOfBufferStyle
-	t.KeyMap.LineNext = key.NewBinding(key.WithKeys("down"))
-	t.KeyMap.LinePrevious = key.NewBinding(key.WithKeys("up"))
-	t.Blur()
-	return t
 }
 
 func (m model) View() string {
@@ -189,35 +117,26 @@ func (m model) View() string {
 		m.keymap.quit,
 	})
 
+	// Page
 	var buff bytes.Buffer
-
 	buff.WriteString(
 		lipgloss.JoinHorizontal(
 			lipgloss.Right,
-			textA(15).View(),
+			m.rencent.View(),
 			m.message.View(),
-			//textA(5).View(),
-			textA(15).View(),
+			m.contacts.View(),
 		))
 	buff.WriteString("\n\n" + help)
-	//buff.WriteString(m.message.View())
 
-	//buff.WriteString(
+	// Render
 	lipgloss.NewStyle().
 		Foreground(lipgloss.Color("#FAFAFA")).
 		Align(lipgloss.Center).
-		//Background(lipgloss.AdaptiveColor{Light: "#874BFD", Dark: "#7D56F4"}).
+		Background(lipgloss.AdaptiveColor{Light: "#874BFD", Dark: "#7D56F4"}).
 		Height(20).
-		Border(lipgloss.NormalBorder()).
+		//Border(lipgloss.NormalBorder()).
 		//AlignHorizontal(lipgloss.Center).
 		Render(buff.String())
-		//m.rencent.View(),
-		//"\n\n",
-		//m.message.View(),
-		////getTable().View(),
-		////))
-
-		////buff.WriteString(m.rencent.View())
 
 	return buff.String()
 }

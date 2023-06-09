@@ -10,10 +10,11 @@ import (
 )
 
 type Model struct {
+	textarea textarea.Model
 }
 
 func NewModel() Model {
-	return Model{}
+	return Model{textarea: getText()}
 }
 
 func (m Model) Init() (t tea.Cmd) {
@@ -24,8 +25,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return nil, tea.Batch([]tea.Cmd{}...)
 }
 
-func (m *Model) View() (s string) {
-	t := textarea.New()
+func (m Model) Focus() {
+	m.textarea = getText()
+	m.textarea.Focus()
+}
+
+func getText() (t textarea.Model) {
+	t = textarea.New()
 	t.Prompt = ""
 	t.ShowLineNumbers = false
 	t.Cursor.Style = constant.CursorStyle
@@ -38,9 +44,12 @@ func (m *Model) View() (s string) {
 	t.BlurredStyle.EndOfBuffer = constant.EndOfBufferStyle
 	t.KeyMap.LineNext = key.NewBinding(key.WithKeys("down"))
 	t.KeyMap.LinePrevious = key.NewBinding(key.WithKeys("up"))
-	t.SetHeight(10)
-	t.Blur()
-	//t.SetHeight(10)
+	t.SetHeight(16) // TODO
+	return t
+}
+
+func (m *Model) View() (s string) {
+	t := getText()
 
 	return lipgloss.JoinHorizontal(
 		lipgloss.Left,
