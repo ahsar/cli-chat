@@ -2,6 +2,8 @@
 package contacts
 
 import (
+	"log"
+
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -12,7 +14,7 @@ type Model struct {
 }
 
 func NewModel() Model {
-	return Model{table: getTable()}
+	return Model{table: setTable()}
 }
 
 func (m Model) Init() (t tea.Cmd) {
@@ -23,31 +25,28 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return nil, tea.Batch([]tea.Cmd{}...)
 }
 
-func (m Model) Focus() {
+func (m *Model) Focus() {
+	log.Println("contacts focus")
 	m.table.Focus()
 }
 
-func (m Model) View() (s string) {
-	t := getTable()
-
-	return t.View()
+func (m *Model) Blur() {
+	m.table.Blur()
 }
 
-func getTable() (t table.Model) {
+func (m *Model) View() (s string) {
+	return m.table.View()
+}
+
+func setTable() (t table.Model) {
 	columns := []table.Column{
 		{Title: "id", Width: 10},
 		{Title: "昵称", Width: 10},
 	}
 
-	rows := []table.Row{
-		{"1", "肖进"},
-		{"2", "tlt"},
-	}
-
 	t = table.New(
 		table.WithColumns(columns),
-		table.WithRows(rows),
-		table.WithFocused(true),
+		//table.WithFocused(true),
 		table.WithHeight(16),
 	)
 
@@ -63,4 +62,13 @@ func getTable() (t table.Model) {
 		Bold(true)
 	t.SetStyles(s)
 	return
+}
+
+func (m *Model) SetRow(r []table.Row) {
+	m.table.SetRows(r)
+}
+
+func (m *Model) SetSize(w, h int) {
+	m.table.SetWidth(w)
+	m.table.SetHeight(h)
 }

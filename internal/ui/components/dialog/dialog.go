@@ -9,25 +9,14 @@ import (
 )
 
 type Model struct {
+	textarea textarea.Model
 }
 
 func NewModel() Model {
-	return Model{}
-}
-
-func (m Model) Init() (t tea.Cmd) {
-	return
-}
-
-func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	return nil, tea.Batch([]tea.Cmd{}...)
-}
-
-func (m Model) View() (s string) {
 	t := textarea.New()
 	t.Prompt = ""
-	t.SetValue("11212")
 	t.ShowLineNumbers = true
+	t.Placeholder = "Press ENTER to send"
 	t.Cursor.Style = constant.CursorStyle
 	t.FocusedStyle.Placeholder = constant.FocusedPlaceholderStyle
 	t.BlurredStyle.Placeholder = constant.PlaceholderStyle
@@ -38,8 +27,23 @@ func (m Model) View() (s string) {
 	t.BlurredStyle.EndOfBuffer = constant.EndOfBufferStyle
 	t.KeyMap.LineNext = key.NewBinding(key.WithKeys("down"))
 	t.KeyMap.LinePrevious = key.NewBinding(key.WithKeys("up"))
-	t.SetHeight(3)
 	t.Blur()
+	return Model{textarea: t}
+}
 
-	return t.View()
+func (m Model) Init() (t tea.Cmd) {
+	return
+}
+
+func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	return nil, tea.Batch([]tea.Cmd{}...)
+}
+
+func (m *Model) SetSize(w, h int) {
+	m.textarea.SetWidth(w)
+	m.textarea.SetHeight(h)
+}
+
+func (m *Model) View() (s string) {
+	return m.textarea.View()
 }

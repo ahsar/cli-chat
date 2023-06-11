@@ -11,25 +11,14 @@ import (
 )
 
 type Model struct {
-	dialog dialog.Model
+	dialog   dialog.Model
+	textarea textarea.Model
 }
 
 func NewModel() Model {
-	return Model{}
-}
-
-func (m Model) Init() (t tea.Cmd) {
-	return
-}
-
-func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	return nil, tea.Batch([]tea.Cmd{}...)
-}
-
-func (m Model) View() (s string) {
 	t := textarea.New()
 	t.Prompt = ""
-	t.SetValue("11212")
+	t.Placeholder = "message..."
 	t.ShowLineNumbers = true
 	t.Cursor.Style = constant.CursorStyle
 	t.FocusedStyle.Placeholder = constant.FocusedPlaceholderStyle
@@ -41,13 +30,33 @@ func (m Model) View() (s string) {
 	t.BlurredStyle.EndOfBuffer = constant.EndOfBufferStyle
 	t.KeyMap.LineNext = key.NewBinding(key.WithKeys("down"))
 	t.KeyMap.LinePrevious = key.NewBinding(key.WithKeys("up"))
-	t.SetHeight(7)
 	t.Blur()
 
+	return Model{
+		textarea: t,
+		dialog:   dialog.NewModel(),
+	}
+}
+
+func (m Model) Init() (t tea.Cmd) {
+	return
+}
+
+func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	return nil, tea.Batch([]tea.Cmd{}...)
+}
+
+func (m *Model) SetSize(w, h int) {
+	m.textarea.SetWidth(w / 3)
+	m.textarea.SetHeight(h/2 - constant.HelpHeight - 1)
+
+	m.dialog.SetSize(w/3, h/2-constant.HelpHeight-3)
+}
+
+func (m *Model) View() (s string) {
 	return lipgloss.JoinVertical(
 		lipgloss.Top,
-		t.View(),
-		t.View(),
-		//m.dialog.View(),
+		m.textarea.View(),
+		m.dialog.View(),
 	)
 }

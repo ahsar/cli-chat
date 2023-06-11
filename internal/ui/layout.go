@@ -2,6 +2,7 @@ package ui
 
 import (
 	"bytes"
+	"log"
 
 	"github.com/ahsar/cli-chat/internal/ui/components/contacts"
 	"github.com/ahsar/cli-chat/internal/ui/components/dialog"
@@ -9,14 +10,10 @@ import (
 	"github.com/ahsar/cli-chat/internal/ui/components/rencent"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/bubbles/table"
 	"github.com/charmbracelet/bubbles/textarea"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-)
-
-const (
-	// 帮助栏高度
-	helpHeight = 1
 )
 
 type keymap struct {
@@ -32,10 +29,19 @@ type model struct {
 	height   int
 	keymap   keymap
 	help     help.Model
-	focus    int
+	current  int
 }
 
 func NewModel() (m model) {
+	log.Println("new ui model")
+
+	cts := contacts.NewModel()
+	cts.SetRow([]table.Row{
+		{"1", "xj"},
+		{"2", "wll"},
+		{"3", "tlt"},
+	})
+
 	m = model{
 		help: help.New(),
 		keymap: keymap{
@@ -52,7 +58,10 @@ func NewModel() (m model) {
 				key.WithHelp("esc", "quit"),
 			),
 		},
-		focus: 3, // 默认通讯录高亮
+		rencent:  rencent.NewModel(),
+		message:  message.NewModel(),
+		contacts: cts,
+		current:  1, // 默认通讯录高亮
 	}
 
 	//m.updateKeybindings()
@@ -63,6 +72,23 @@ func (m model) Init() tea.Cmd {
 	return textarea.Blink
 }
 
+func (m *model) blur() {
+	m.contacts.Blur()
+	m.rencent.Blur()
+}
+
+func (m *model) focus() {
+	if m.current == 1 {
+		m.current = 0
+		m.contacts.Blur()
+		m.rencent.Focus()
+	} else {
+		m.current = 1
+		m.rencent.Blur()
+		m.contacts.Focus()
+	}
+}
+
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmds []tea.Cmd
 
@@ -70,11 +96,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, m.keymap.quit):
-			//todo blur
+			//todo all blur
 			return m, tea.Quit
 		case key.Matches(msg, m.keymap.next):
-			// todo focus
-			m.contacts.Focus()
+			m.focus()
 		case key.Matches(msg, m.keymap.prev):
 			//m.inputs[m.focus].Blur()
 			//m.focus--
@@ -96,6 +121,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.height = msg.Height
 		m.width = msg.Width
 	}
+	m.sizeInput()
 
 	//m.updateKeybindings()
 
@@ -106,7 +132,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	//cmds = append(cmds, cmd)
 	//}
 
-	// TODO update helpHeight
 	return m, tea.Batch(cmds...)
 }
 
@@ -117,7 +142,7 @@ func (m model) View() string {
 		m.keymap.quit,
 	})
 
-	// Page
+	// Panels
 	var buff bytes.Buffer
 	buff.WriteString(
 		lipgloss.JoinHorizontal(

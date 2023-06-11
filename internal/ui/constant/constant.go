@@ -2,6 +2,10 @@ package constant
 
 import "github.com/charmbracelet/lipgloss"
 
+const (
+	HelpHeight = 1
+)
+
 var (
 	CursorStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("212"))
 
