@@ -2,6 +2,8 @@
 package rencent
 
 import (
+	"log"
+
 	"github.com/ahsar/cli-chat/internal/ui/constant"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textarea"
@@ -16,7 +18,8 @@ type Model struct {
 func NewModel() Model {
 	t := textarea.New()
 	t.Prompt = ""
-	t.SetValue("最近联系的人")
+	t.Placeholder = "rencent contacts"
+	//t.SetValue("112\n1212\n12")
 	t.ShowLineNumbers = true
 	t.Cursor.Style = constant.CursorStyle
 	t.FocusedStyle.Placeholder = constant.FocusedPlaceholderStyle
@@ -45,8 +48,13 @@ func (m Model) Init() (t tea.Cmd) {
 	return
 }
 
-func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	return nil, tea.Batch([]tea.Cmd{}...)
+func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	log.Println("rencent focus msg", msg)
+	log.Println("rencent focus", m.textarea.Focused())
+	log.Println("rencent value", m.textarea.Value())
+	var cmd tea.Cmd
+	m.textarea, cmd = m.textarea.Update(cmd)
+	return m, tea.Batch(cmd)
 }
 
 func (m *Model) Focus() {

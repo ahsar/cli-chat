@@ -21,12 +21,14 @@ func (m Model) Init() (t tea.Cmd) {
 	return
 }
 
-func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	return nil, tea.Batch([]tea.Cmd{}...)
+func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var cmd tea.Cmd
+	log.Println("contacts focus", m.table.Focused())
+	m.table, cmd = m.table.Update(msg)
+	return m, cmd
 }
 
 func (m *Model) Focus() {
-	log.Println("contacts focus")
 	m.table.Focus()
 }
 
@@ -69,6 +71,12 @@ func (m *Model) SetRow(r []table.Row) {
 }
 
 func (m *Model) SetSize(w, h int) {
+
+	columns := []table.Column{
+		{Title: "id", Width: w / 2},
+		{Title: "昵称", Width: w / 2},
+	}
+	m.table.SetColumns(columns)
 	m.table.SetWidth(w)
 	m.table.SetHeight(h)
 }

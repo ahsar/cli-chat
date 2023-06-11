@@ -96,26 +96,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, m.keymap.quit):
-			//todo all blur
+			m.blur()
 			return m, tea.Quit
 		case key.Matches(msg, m.keymap.next):
 			m.focus()
 		case key.Matches(msg, m.keymap.prev):
-			//m.inputs[m.focus].Blur()
-			//m.focus--
-			//if m.focus < 0 {
-			//m.focus = len(m.inputs) - 1
-			//}
-			//cmd := m.inputs[m.focus].Focus()
-			//cmds = append(cmds, cmd)
-			//case key.Matches(msg, m.keymap.add):
-			//m.inputs = append(m.inputs, newTextarea())
-
-			//case key.Matches(msg, m.keymap.remove):
-			//m.inputs = m.inputs[:len(m.inputs)-1]
-			//if m.focus > len(m.inputs)-1 {
-			//m.focus = len(m.inputs) - 1
-			//}
 		}
 	case tea.WindowSizeMsg:
 		m.height = msg.Height
@@ -125,12 +110,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	//m.updateKeybindings()
 
-	// Update all textareas
-	//for i := range m.inputs {
-	//newModel, cmd := m.inputs[i].Update(msg)
-	//m.inputs[i] = newModel
-	//cmds = append(cmds, cmd)
-	//}
+	var cmd tea.Cmd
+	if m.current == 1 {
+		_, cmd := m.contacts.Update(msg)
+		cmds = append(cmds, cmd)
+	} else {
+		_, cmd = m.rencent.Update(msg)
+		cmds = append(cmds, cmd)
+	}
 
 	return m, tea.Batch(cmds...)
 }
