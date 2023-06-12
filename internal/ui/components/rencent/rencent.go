@@ -53,7 +53,7 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	log.Println("rencent focus", m.textarea.Focused())
 	log.Println("rencent value", m.textarea.Value())
 	var cmd tea.Cmd
-	m.textarea, cmd = m.textarea.Update(cmd)
+	m.textarea, cmd = m.textarea.Update(msg)
 	return m, tea.Batch(cmd)
 }
 
