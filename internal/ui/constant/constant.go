@@ -4,6 +4,10 @@ import "github.com/charmbracelet/lipgloss"
 
 const (
 	HelpHeight = 1
+
+	ContactPanel = 1
+
+	RencentPanel = 0
 )
 
 var (

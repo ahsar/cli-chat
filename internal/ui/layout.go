@@ -8,6 +8,7 @@ import (
 	"github.com/ahsar/cli-chat/internal/ui/components/dialog"
 	"github.com/ahsar/cli-chat/internal/ui/components/message"
 	"github.com/ahsar/cli-chat/internal/ui/components/rencent"
+	"github.com/ahsar/cli-chat/internal/ui/constant"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/table"
@@ -17,7 +18,7 @@ import (
 )
 
 type keymap struct {
-	next, prev, quit key.Binding
+	next, prev, quit, enter key.Binding
 }
 
 type model struct {
@@ -57,6 +58,10 @@ func NewModel() (m model) {
 				key.WithKeys("esc", "ctrl+c"),
 				key.WithHelp("esc", "quit"),
 			),
+			enter: key.NewBinding(
+				key.WithKeys("enter"),
+				key.WithHelp("enter", "send or select"),
+			),
 		},
 		rencent:  rencent.NewModel(),
 		message:  message.NewModel(),
@@ -72,23 +77,6 @@ func (m model) Init() tea.Cmd {
 	return textarea.Blink
 }
 
-func (m *model) blur() {
-	m.contacts.Blur()
-	m.rencent.Blur()
-}
-
-func (m *model) focus() {
-	if m.current == 1 {
-		m.current = 0
-		m.contacts.Blur()
-		m.rencent.Focus()
-	} else {
-		m.current = 1
-		m.rencent.Blur()
-		m.contacts.Focus()
-	}
-}
-
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmds []tea.Cmd
 
@@ -101,6 +89,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.keymap.next):
 			m.focus()
 		case key.Matches(msg, m.keymap.prev):
+			//todo
+		case key.Matches(msg, m.keymap.enter):
+			log.Println("ui layout enter")
+			//todo
 		}
 	case tea.WindowSizeMsg:
 		m.height = msg.Height
@@ -111,12 +103,23 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	//m.updateKeybindings()
 
 	var cmd tea.Cmd
-	if m.current == 1 {
+	if m.current == constant.ContactPanel {
 		_, cmd := m.contacts.Update(msg)
 		cmds = append(cmds, cmd)
+
+		// 重新定义enter键
+		m.keymap.enter = key.NewBinding(
+			key.WithKeys("enter"),
+			key.WithHelp("enter", "enter 选择联系人"),
+		)
 	} else {
 		_, cmd = m.rencent.Update(msg)
 		cmds = append(cmds, cmd)
+
+		m.keymap.enter = key.NewBinding(
+			key.WithKeys("enter"),
+			key.WithHelp("enter", "enter 发送消息"),
+		)
 	}
 
 	return m, tea.Batch(cmds...)
@@ -127,6 +130,7 @@ func (m model) View() string {
 		m.keymap.next,
 		m.keymap.prev,
 		m.keymap.quit,
+		m.keymap.enter,
 	})
 
 	// Panels

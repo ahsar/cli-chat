@@ -35,8 +35,10 @@ func (m Model) Init() (t tea.Cmd) {
 	return
 }
 
-func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	return nil, tea.Batch([]tea.Cmd{}...)
+func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var cmd tea.Cmd
+	m.textarea, cmd = m.textarea.Update(msg)
+	return m, tea.Batch(cmd)
 }
 
 func (m *Model) SetSize(w, h int) {
@@ -46,4 +48,8 @@ func (m *Model) SetSize(w, h int) {
 
 func (m *Model) View() (s string) {
 	return m.textarea.View()
+}
+
+func (m *Model) Focus() {
+	m.textarea.Focus()
 }

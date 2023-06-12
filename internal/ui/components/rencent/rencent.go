@@ -19,7 +19,6 @@ func NewModel() Model {
 	t := textarea.New()
 	t.Prompt = ""
 	t.Placeholder = "rencent contacts"
-	//t.SetValue("112\n1212\n12")
 	t.ShowLineNumbers = true
 	t.Cursor.Style = constant.CursorStyle
 	t.FocusedStyle.Placeholder = constant.FocusedPlaceholderStyle

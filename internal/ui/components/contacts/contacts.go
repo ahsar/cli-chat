@@ -24,6 +24,7 @@ func (m Model) Init() (t tea.Cmd) {
 func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	log.Println("contacts focus", m.table.Focused())
+	log.Println("contacts Selected", m.table.SelectedRow())
 	m.table, cmd = m.table.Update(msg)
 	return m, cmd
 }
@@ -63,6 +64,7 @@ func setTable() (t table.Model) {
 		Background(lipgloss.Color("57")).
 		Bold(true)
 	t.SetStyles(s)
+	t.Focus()
 	return
 }
 
