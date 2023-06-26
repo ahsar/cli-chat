@@ -1,8 +1,7 @@
 package chat
 
 import (
-	"fmt"
-	"strings"
+	"strconv"
 
 	"github.com/eatmoreapple/openwechat"
 
@@ -13,24 +12,23 @@ var FriendsMap map[int]*openwechat.Friend
 
 // Friends
 // 获取账号下所有好友
-func Friends() (s string) {
+// []string{id, name}
+func Friends() (s [][]string) {
 	friends, err := self.Friends()
 	if err != nil {
 		log.Fatal("获取好友列表失败", err)
 		return
 	}
 
-	var builder strings.Builder
-	l := len(friends)
-	FriendsMap = make(map[int]*openwechat.Friend, l)
+	s = make([][]string, 0, len(friends))
 	for i, fr := range friends {
 		name := fr.NickName
 		if fr.RemarkName != "" {
 			name = fr.RemarkName
 		}
 
-		builder.WriteString(fmt.Sprintf("%d %s\n", i, name))
-		FriendsMap[i] = fr
+		s = append(s, []string{strconv.Itoa(i), name})
 	}
-	return builder.String()
+
+	return
 }

@@ -11,7 +11,6 @@ import (
 	"github.com/ahsar/cli-chat/internal/ui/constant"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
-	"github.com/charmbracelet/bubbles/table"
 	"github.com/charmbracelet/bubbles/textarea"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -36,13 +35,6 @@ type model struct {
 func NewModel() (m model) {
 	log.Println("new ui model")
 
-	cts := contacts.NewModel()
-	cts.SetRow([]table.Row{
-		{"1", "xj"},
-		{"2", "wll"},
-		{"3", "tlt"},
-	})
-
 	m = model{
 		help: help.New(),
 		keymap: keymap{
@@ -65,11 +57,12 @@ func NewModel() (m model) {
 		},
 		rencent:  rencent.NewModel(),
 		message:  message.NewModel(),
-		contacts: cts,
+		contacts: contacts.NewModel(),
 		current:  1, // 默认通讯录高亮
 	}
 
 	//m.updateKeybindings()
+	m.SetContacts()
 	return
 }
 
