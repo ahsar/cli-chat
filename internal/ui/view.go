@@ -3,7 +3,6 @@ package ui
 import (
 	"log"
 
-	"github.com/ahsar/cli-chat/internal/chat"
 	"github.com/ahsar/cli-chat/internal/ui/constant"
 	"github.com/charmbracelet/bubbles/table"
 )
@@ -31,21 +30,34 @@ func (m *model) blur() {
 	m.rencent.Blur()
 }
 
-func (m *model) focus() {
-	if m.current == constant.ContactPanel {
-		m.current = constant.RencentPanel
+func (m *model) getCurrent() (b byte) {
+	return m.contacts.Focused |
+		m.message.Focused |
+		m.rencent.Focused
+}
+
+func (m *model) focusInTurn() {
+	i := m.getCurrent()
+	switch i {
+	case i & constant.ContactPanel:
 		m.contacts.Blur()
 		m.rencent.Focus()
-	} else {
-		m.current = constant.ContactPanel
-		m.rencent.Blur()
+	case i & constant.RencentPanel:
 		m.contacts.Focus()
+		m.rencent.Blur()
 	}
 }
 
 // 设定通讯录
 func (m *model) SetContacts() {
-	frList := chat.Friends()
+	//TODO
+	frList := [][]string{
+		{"1", "x"},
+		{"2", "y"},
+		{"3", "z"},
+		{"4", "t"},
+	}
+	//frList := chat.Friends()
 	l := len(frList)
 	if l <= 0 {
 		return

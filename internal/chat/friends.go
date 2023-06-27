@@ -8,7 +8,7 @@ import (
 	"log"
 )
 
-var FriendsMap map[int]*openwechat.Friend
+var FriendsMap []*openwechat.Friend
 
 // Friends
 // 获取账号下所有好友
@@ -20,13 +20,17 @@ func Friends() (s [][]string) {
 		return
 	}
 
-	s = make([][]string, 0, len(friends))
+	l := len(friends)
+	s = make([][]string, 0, l)
+	FriendsMap = make([]*openwechat.Friend, l)
+
 	for i, fr := range friends {
 		name := fr.NickName
 		if fr.RemarkName != "" {
 			name = fr.RemarkName
 		}
 
+		FriendsMap[i] = fr
 		s = append(s, []string{strconv.Itoa(i), name})
 	}
 

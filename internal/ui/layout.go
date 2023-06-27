@@ -5,10 +5,11 @@ import (
 	"log"
 
 	"github.com/ahsar/cli-chat/internal/ui/components/contacts"
-	"github.com/ahsar/cli-chat/internal/ui/components/dialog"
+	"github.com/ahsar/cli-chat/internal/ui/constant"
+
+	//"github.com/ahsar/cli-chat/internal/ui/components/dialog"
 	"github.com/ahsar/cli-chat/internal/ui/components/message"
 	"github.com/ahsar/cli-chat/internal/ui/components/rencent"
-	"github.com/ahsar/cli-chat/internal/ui/constant"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textarea"
@@ -23,13 +24,12 @@ type keymap struct {
 type model struct {
 	rencent  rencent.Model
 	contacts contacts.Model
-	dialog   dialog.Model
-	message  message.Model
-	width    int
-	height   int
-	keymap   keymap
-	help     help.Model
-	current  int
+	//dialog   dialog.Model
+	message message.Model
+	width   int
+	height  int
+	keymap  keymap
+	help    help.Model
 }
 
 func NewModel() (m model) {
@@ -58,10 +58,9 @@ func NewModel() (m model) {
 		rencent:  rencent.NewModel(),
 		message:  message.NewModel(),
 		contacts: contacts.NewModel(),
-		current:  1, // 默认通讯录高亮
 	}
 
-	//m.updateKeybindings()
+	m.contacts.Focus()
 	m.SetContacts()
 	return
 }
@@ -80,7 +79,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.blur()
 			return m, tea.Quit
 		case key.Matches(msg, m.keymap.next):
-			m.focus()
+			m.focusInTurn()
 		case key.Matches(msg, m.keymap.prev):
 			//todo
 		case key.Matches(msg, m.keymap.enter):
@@ -93,26 +92,27 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 	m.sizeInput()
 
-	//m.updateKeybindings()
-
 	var cmd tea.Cmd
-	if m.current == constant.ContactPanel {
-		_, cmd := m.contacts.Update(msg)
+	i := m.getCurrent()
+	switch i {
+	case i & constant.ContactPanel:
+		_, cmd = m.contacts.Update(msg)
 		cmds = append(cmds, cmd)
-
-		// 重新定义enter键
 		m.keymap.enter = key.NewBinding(
 			key.WithKeys("enter"),
-			key.WithHelp("enter", "enter 选择联系人"),
-		)
-	} else {
+			key.WithHelp("enter", "enter 选择联系人"))
+
+	case i & constant.RencentPanel:
 		_, cmd = m.rencent.Update(msg)
 		cmds = append(cmds, cmd)
-
 		m.keymap.enter = key.NewBinding(
 			key.WithKeys("enter"),
 			key.WithHelp("enter", "enter 发送消息"),
 		)
+
+	case i & constant.DialogPanel:
+		_, cmd = m.message.Update(msg)
+		cmds = append(cmds, cmd)
 	}
 
 	return m, tea.Batch(cmds...)

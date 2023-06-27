@@ -13,6 +13,7 @@ import (
 
 type Model struct {
 	textarea textarea.Model
+	Focused  byte
 }
 
 func NewModel() Model {
@@ -34,15 +35,6 @@ func NewModel() Model {
 	return Model{textarea: t}
 }
 
-func (m *Model) SetSize(w, h int) {
-	m.textarea.SetWidth(w)
-	m.textarea.SetHeight(h)
-}
-
-func (m *Model) Blur() {
-	m.textarea.Blur()
-}
-
 func (m Model) Init() (t tea.Cmd) {
 	return
 }
@@ -56,13 +48,24 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, tea.Batch(cmd)
 }
 
-func (m *Model) Focus() {
-	m.textarea.Focus()
-}
-
 func (m *Model) View() (s string) {
 	return lipgloss.JoinHorizontal(
 		lipgloss.Left,
 		m.textarea.View(),
 	)
+}
+
+func (m *Model) SetSize(w, h int) {
+	m.textarea.SetWidth(w)
+	m.textarea.SetHeight(h)
+}
+
+func (m *Model) Focus() {
+	m.textarea.Focus()
+	m.Focused = constant.RencentPanel
+}
+
+func (m *Model) Blur() {
+	m.textarea.Blur()
+	m.Focused = 0
 }

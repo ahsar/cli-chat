@@ -2,7 +2,8 @@
 package message
 
 import (
-	"github.com/ahsar/cli-chat/internal/ui/components/dialog"
+	//"github.com/ahsar/cli-chat/internal/ui/components/dialog"
+
 	"github.com/ahsar/cli-chat/internal/ui/constant"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textarea"
@@ -10,9 +11,22 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+var Msg Model
+
+type User struct {
+	Id string
+}
+
+type keymap struct {
+	enter key.Binding // 发送消息
+}
+
 type Model struct {
-	dialog   dialog.Model
+	dialog   DialogModel
 	textarea textarea.Model
+	user     User // current dialog user
+	keymap   keymap
+	Focused  byte
 }
 
 func NewModel() Model {
@@ -30,12 +44,20 @@ func NewModel() Model {
 	t.BlurredStyle.EndOfBuffer = constant.EndOfBufferStyle
 	t.KeyMap.LineNext = key.NewBinding(key.WithKeys("down"))
 	t.KeyMap.LinePrevious = key.NewBinding(key.WithKeys("up"))
-	t.Blur()
+	t.Focus()
+	//t.Blur()
 
-	return Model{
+	Msg = Model{
 		textarea: t,
-		dialog:   dialog.NewModel(),
+		dialog:   NewDialogModel(),
+		keymap: keymap{
+			enter: key.NewBinding(
+				key.WithKeys("enter"),
+				key.WithHelp("enter", "enter to send"),
+			),
+		},
 	}
+	return Msg
 }
 
 func (m Model) Init() (t tea.Cmd) {
@@ -43,7 +65,9 @@ func (m Model) Init() (t tea.Cmd) {
 }
 
 func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	return nil, tea.Batch([]tea.Cmd{}...)
+	var cmd tea.Cmd
+	m.textarea, cmd = m.textarea.Update(msg)
+	return m, tea.Batch(cmd)
 }
 
 func (m *Model) SetSize(w, h int) {
@@ -59,4 +83,20 @@ func (m *Model) View() (s string) {
 		m.textarea.View(),
 		m.dialog.View(),
 	)
+}
+
+func (m *Model) SetUser(id string) {
+	m.user.Id = id
+	m.Focused = constant.DialogPanel
+	// TODO
+}
+
+func (m *Model) Focus() {
+	m.dialog.Focus()
+	m.Focused = constant.DialogPanel
+}
+
+func (m *Model) Blur() {
+	m.dialog.Focus()
+	m.Focused = 0
 }

@@ -1,18 +1,22 @@
 // user input box
-package dialog
+package message
 
 import (
+	"log"
+
 	"github.com/ahsar/cli-chat/internal/ui/constant"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textarea"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type Model struct {
+var Dialog DialogModel
+
+type DialogModel struct {
 	textarea textarea.Model
 }
 
-func NewModel() Model {
+func NewDialogModel() DialogModel {
 	t := textarea.New()
 	t.Prompt = ""
 	t.ShowLineNumbers = true
@@ -28,28 +32,36 @@ func NewModel() Model {
 	t.KeyMap.LineNext = key.NewBinding(key.WithKeys("down"))
 	t.KeyMap.LinePrevious = key.NewBinding(key.WithKeys("up"))
 	t.Blur()
-	return Model{textarea: t}
+	Dialog = DialogModel{textarea: t}
+	return Dialog
 }
 
-func (m Model) Init() (t tea.Cmd) {
+func (m DialogModel) Init() (t tea.Cmd) {
 	return
 }
 
-func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *DialogModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
+	log.Println("dialog update")
 	m.textarea, cmd = m.textarea.Update(msg)
 	return m, tea.Batch(cmd)
 }
 
-func (m *Model) SetSize(w, h int) {
+func (m *DialogModel) SetSize(w, h int) {
 	m.textarea.SetWidth(w)
 	m.textarea.SetHeight(h)
 }
 
-func (m *Model) View() (s string) {
+func (m *DialogModel) View() (s string) {
 	return m.textarea.View()
 }
 
-func (m *Model) Focus() {
+func (m *DialogModel) Focus() {
+	log.Println("------dialog focus")
+	m.textarea.SetValue("----qwe2---------")
 	m.textarea.Focus()
+}
+
+func (m *DialogModel) Blur() {
+	m.textarea.Blur()
 }

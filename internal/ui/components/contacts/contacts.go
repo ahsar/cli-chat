@@ -2,19 +2,35 @@
 package contacts
 
 import (
-	"log"
+	"github.com/ahsar/cli-chat/internal/ui/constant"
 
+	"github.com/ahsar/cli-chat/internal/ui/components/message"
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 
+type keymap struct {
+	enter key.Binding
+}
+
 type Model struct {
-	table table.Model
+	table   table.Model
+	keymap  keymap
+	Focused byte
 }
 
 func NewModel() Model {
-	return Model{table: setTable()}
+	return Model{
+		table: setTable(),
+		keymap: keymap{
+			enter: key.NewBinding(
+				key.WithKeys("enter"),
+				key.WithHelp("enter", "select frients"),
+			),
+		},
+	}
 }
 
 func (m Model) Init() (t tea.Cmd) {
@@ -23,18 +39,37 @@ func (m Model) Init() (t tea.Cmd) {
 
 func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
-	log.Println("contacts focus", m.table.Focused())
-	log.Println("contacts Selected", m.table.SelectedRow())
+
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch {
+		case key.Matches(msg, m.keymap.enter):
+			// 1. focus dialog textarea
+			message.Msg.Focus()
+
+			// 2. blur current(contacts)
+			m.Blur()
+
+			// 3. update global state machine
+			//global.CurrentPanel = constant.DialogPanel
+
+			// 4. register message user
+			message.Msg.SetUser(m.table.SelectedRow()[0])
+		}
+	}
+
 	m.table, cmd = m.table.Update(msg)
 	return m, cmd
 }
 
 func (m *Model) Focus() {
 	m.table.Focus()
+	m.Focused = constant.ContactPanel
 }
 
 func (m *Model) Blur() {
 	m.table.Blur()
+	m.Focused = 0
 }
 
 func (m *Model) View() (s string) {
@@ -64,7 +99,7 @@ func setTable() (t table.Model) {
 		Background(lipgloss.Color("57")).
 		Bold(true)
 	t.SetStyles(s)
-	t.Focus()
+	//t.Focus()
 	return
 }
 
@@ -73,7 +108,6 @@ func (m *Model) SetRow(r []table.Row) {
 }
 
 func (m *Model) SetSize(w, h int) {
-
 	columns := []table.Column{
 		{Title: "id", Width: w / 2},
 		{Title: "昵称", Width: w / 2},
