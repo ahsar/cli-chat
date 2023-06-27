@@ -44,17 +44,11 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, m.keymap.enter):
-			// 1. focus dialog textarea
-			message.Msg.Focus()
-
-			// 2. blur current(contacts)
-			m.Blur()
-
-			// 3. update global state machine
-			//global.CurrentPanel = constant.DialogPanel
-
-			// 4. register message user
+			// 1. register message user
 			message.Msg.SetUser(m.table.SelectedRow()[0])
+
+			// 2. blur current panel
+			m.Blur()
 		}
 	}
 

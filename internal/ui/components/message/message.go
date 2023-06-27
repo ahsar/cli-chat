@@ -66,7 +66,10 @@ func (m Model) Init() (t tea.Cmd) {
 
 func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
+
+	// todo
 	m.textarea, cmd = m.textarea.Update(msg)
+
 	return m, tea.Batch(cmd)
 }
 
@@ -87,8 +90,7 @@ func (m *Model) View() (s string) {
 
 func (m *Model) SetUser(id string) {
 	m.user.Id = id
-	m.Focused = constant.DialogPanel
-	// TODO
+	m.Focus()
 }
 
 func (m *Model) Focus() {
