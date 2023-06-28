@@ -38,6 +38,12 @@ func Friends() (s [][]string) {
 }
 
 func TalkToId(i int, s string) {
+	// TODO
+	if true {
+		log.Printf("send %s to %d\n", s, i)
+		return
+	}
+
 	u := friendsMap[i]
 	u.SendText(s)
 }

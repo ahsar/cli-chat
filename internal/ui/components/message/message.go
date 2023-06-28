@@ -50,7 +50,6 @@ func (m *Model) Init() (t tea.Cmd) {
 func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
-	// todo
 	m.textarea, cmd = m.textarea.Update(msg)
 
 	m.dialog, cmd = m.dialog.Update(msg)
@@ -85,4 +84,19 @@ func (m *Model) Focus() {
 func (m *Model) Blur() {
 	m.Focused = 0
 	m.dialog.Blur()
+}
+
+// SetMyTxt
+//
+// 显示我的回复信息
+func (m *Model) SetMyTxt(s string) {
+	m.textarea.InsertString("(我): " + s + "\n")
+	// cursor down didn't work ?
+	//m.textarea.CursorEnd()
+	//m.textarea.CursorDown()
+
+	// textarea can't cursor down
+	if m.textarea.Line() >= m.textarea.Height() {
+		m.textarea.Reset()
+	}
 }

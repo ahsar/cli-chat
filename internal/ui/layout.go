@@ -18,7 +18,7 @@ import (
 )
 
 type keymap struct {
-	next, prev, quit, enter key.Binding
+	next, quit, enter key.Binding
 }
 
 type model struct {
@@ -40,10 +40,6 @@ func NewModel() (m model) {
 			next: key.NewBinding(
 				key.WithKeys("tab"),
 				key.WithHelp("tab", "next"),
-			),
-			prev: key.NewBinding(
-				key.WithKeys("shift+tab"),
-				key.WithHelp("shift+tab", "prev"),
 			),
 			quit: key.NewBinding(
 				key.WithKeys("esc", "ctrl+c"),
@@ -79,8 +75,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		case key.Matches(msg, m.keymap.next):
 			m.focusInTurn()
-		case key.Matches(msg, m.keymap.prev):
-			//todo
 		case key.Matches(msg, m.keymap.enter):
 			//log.Println("ui layout enter")
 			//todo
@@ -120,7 +114,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m model) View() string {
 	helpinfo := m.help.ShortHelpView([]key.Binding{
 		m.keymap.next,
-		m.keymap.prev,
 		m.keymap.quit,
 		m.keymap.enter,
 	})

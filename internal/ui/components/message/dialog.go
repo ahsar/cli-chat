@@ -2,6 +2,7 @@
 package message
 
 import (
+	"log"
 	"strconv"
 
 	"github.com/ahsar/cli-chat/internal/chat"
@@ -12,7 +13,7 @@ import (
 )
 
 type keymap struct {
-	send key.Binding
+	esc, send key.Binding
 }
 
 type user struct {
@@ -48,6 +49,9 @@ func NewDialogModel() *DialogModel {
 			send: key.NewBinding(
 				key.WithKeys("ctrl+s"),
 			),
+			esc: key.NewBinding(
+				key.WithKeys("ctrl+q"),
+			),
 		},
 	}
 }
@@ -63,14 +67,19 @@ func (m *DialogModel) Update(msg tea.Msg) (*DialogModel, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, m.keymap.send):
+			txt := m.textarea.Value()
 			// 1. send content to vx
-			chat.TalkToId(m.user.id, m.textarea.Value())
+			chat.TalkToId(m.user.id, txt)
 
 			// 2. send content to message panel
-			//TODO
+			Msg.SetMyTxt(txt)
 
 			// 3. clear dialog panel input
 			m.ClearInput()
+
+		case key.Matches(msg, m.keymap.esc):
+			log.Println("exit dialog panel")
+			m.Blur()
 		}
 	}
 	m.textarea, cmd = m.textarea.Update(msg)
