@@ -1,7 +1,7 @@
 package chat
 
 import (
-	"fmt"
+	"log"
 
 	//"github.com/ahsar/cli-chat/internal/ui"
 	"github.com/eatmoreapple/openwechat"
@@ -16,7 +16,7 @@ var (
 
 // 登录wechat
 func Login() {
-	fmt.Println("now login")
+	log.Println("now login")
 	if bot != nil && bot.Alive() {
 		return
 	}
@@ -29,7 +29,7 @@ func Login() {
 	reloadStorage := openwechat.NewFileHotReloadStorage("storage.json")
 	defer reloadStorage.Close()
 	if err := bot.PushLogin(reloadStorage, openwechat.NewRetryLoginOption()); err != nil {
-		fmt.Println("ERR push login", err)
+		log.Println("ERR push login", err)
 	}
 
 	// 注册消息处理函数
@@ -42,7 +42,7 @@ func Login() {
 	// 获取登陆的用户
 	self, err = bot.GetCurrentUser()
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 
@@ -52,5 +52,5 @@ func Login() {
 
 func consoleQrCode(uuid string) {
 	q, _ := qrcode.New("https://login.weixin.qq.com/l/"+uuid, qrcode.Low)
-	fmt.Println(q.ToString(true))
+	log.Println(q.ToString(true))
 }

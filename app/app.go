@@ -3,14 +3,14 @@ package app
 import (
 	"log"
 
-	//"github.com/ahsar/cli-chat/internal/chat"
+	"github.com/ahsar/cli-chat/internal/chat"
 	"github.com/ahsar/cli-chat/internal/ui"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
 func Run() {
 	// 登录
-	//chat.Login()
+	chat.Login()
 
 	f, err := tea.LogToFile("debug.log", "")
 	if err != nil {

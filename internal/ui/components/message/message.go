@@ -13,19 +13,9 @@ import (
 
 var Msg *Model
 
-type User struct {
-	Id string
-}
-
-type keymap struct {
-	enter key.Binding
-}
-
 type Model struct {
 	dialog   *DialogModel
 	textarea textarea.Model
-	user     User // current dialog user
-	keymap   keymap
 	Focused  byte
 }
 
@@ -44,16 +34,11 @@ func NewModel() *Model {
 	t.BlurredStyle.EndOfBuffer = constant.EndOfBufferStyle
 	t.KeyMap.LineNext = key.NewBinding(key.WithKeys("down"))
 	t.KeyMap.LinePrevious = key.NewBinding(key.WithKeys("up"))
+	t.Blur()
 
 	Msg = &Model{
 		textarea: t,
 		dialog:   NewDialogModel(),
-		keymap: keymap{
-			enter: key.NewBinding(
-				key.WithKeys("enter"),
-				key.WithHelp("enter", "enter to send"),
-			),
-		},
 	}
 	return Msg
 }
@@ -67,6 +52,7 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	// todo
 	m.textarea, cmd = m.textarea.Update(msg)
+
 	m.dialog, cmd = m.dialog.Update(msg)
 
 	return m, tea.Batch(cmd)
@@ -75,7 +61,6 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m *Model) SetSize(w, h int) {
 	m.textarea.SetWidth(w / 3)
 	m.textarea.SetHeight(h/2 - constant.HelpHeight - 1)
-
 	m.dialog.SetSize(w/3, h/2-constant.HelpHeight-3)
 }
 
@@ -88,7 +73,7 @@ func (m *Model) View() (s string) {
 }
 
 func (m *Model) SetUser(id string) {
-	m.user.Id = id
+	m.dialog.SetUser(id)
 	m.Focus()
 }
 
@@ -98,6 +83,6 @@ func (m *Model) Focus() {
 }
 
 func (m *Model) Blur() {
-	m.dialog.Focus()
 	m.Focused = 0
+	m.dialog.Blur()
 }

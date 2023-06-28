@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"github.com/ahsar/cli-chat/internal/chat"
 	"github.com/ahsar/cli-chat/internal/ui/constant"
 	"github.com/charmbracelet/bubbles/table"
 )
@@ -43,13 +44,13 @@ func (m *model) focusInTurn() {
 // 设定通讯录
 func (m *model) SetContacts() {
 	//TODO
-	frList := [][]string{
-		{"1", "x"},
-		{"2", "y"},
-		{"3", "z"},
-		{"4", "t"},
-	}
-	//frList := chat.Friends()
+	//frList := [][]string{
+	//{"1", "x"},
+	//{"2", "y"},
+	//{"3", "z"},
+	//{"4", "t"},
+	//}
+	frList := chat.Friends()
 	l := len(frList)
 	if l <= 0 {
 		return
