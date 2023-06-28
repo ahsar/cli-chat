@@ -17,9 +17,13 @@ func (m *model) sizeInput() {
 		m.height-constant.HelpHeight-3)
 }
 
-func (m *model) blur() {
+func (m *model) exit() {
 	m.contacts.Blur()
 	m.rencent.Blur()
+	m.message.Blur()
+
+	// TODO
+	//chat.Logout()
 }
 
 func (m *model) getCurrent() (b byte) {

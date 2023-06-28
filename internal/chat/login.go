@@ -3,7 +3,6 @@ package chat
 import (
 	"log"
 
-	//"github.com/ahsar/cli-chat/internal/ui"
 	"github.com/eatmoreapple/openwechat"
 	"github.com/skip2/go-qrcode"
 )
@@ -48,6 +47,10 @@ func Login() {
 
 	// 阻塞主goroutine, 直到发生异常或者用户主动退出
 	//go bot.Block()
+}
+
+func Logout() {
+	bot.Logout()
 }
 
 func consoleQrCode(uuid string) {

@@ -2,7 +2,8 @@ package ui
 
 import (
 	"bytes"
-	"log"
+
+	"github.com/charmbracelet/log"
 
 	"github.com/ahsar/cli-chat/internal/ui/components/contacts"
 	"github.com/ahsar/cli-chat/internal/ui/constant"
@@ -32,7 +33,7 @@ type model struct {
 }
 
 func NewModel() (m model) {
-	log.Println("new ui model")
+	log.Info("new ui model")
 
 	m = model{
 		help: help.New(),
@@ -71,7 +72,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, m.keymap.quit):
-			m.blur()
+			m.exit()
 			return m, tea.Quit
 		case key.Matches(msg, m.keymap.next):
 			m.focusInTurn()
