@@ -11,25 +11,25 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-var Msg Model
+var Msg *Model
 
 type User struct {
 	Id string
 }
 
 type keymap struct {
-	enter key.Binding // 发送消息
+	enter key.Binding
 }
 
 type Model struct {
-	dialog   DialogModel
+	dialog   *DialogModel
 	textarea textarea.Model
 	user     User // current dialog user
 	keymap   keymap
 	Focused  byte
 }
 
-func NewModel() Model {
+func NewModel() *Model {
 	t := textarea.New()
 	t.Prompt = ""
 	t.Placeholder = "message..."
@@ -44,10 +44,8 @@ func NewModel() Model {
 	t.BlurredStyle.EndOfBuffer = constant.EndOfBufferStyle
 	t.KeyMap.LineNext = key.NewBinding(key.WithKeys("down"))
 	t.KeyMap.LinePrevious = key.NewBinding(key.WithKeys("up"))
-	t.Focus()
-	//t.Blur()
 
-	Msg = Model{
+	Msg = &Model{
 		textarea: t,
 		dialog:   NewDialogModel(),
 		keymap: keymap{
@@ -60,7 +58,7 @@ func NewModel() Model {
 	return Msg
 }
 
-func (m Model) Init() (t tea.Cmd) {
+func (m *Model) Init() (t tea.Cmd) {
 	return
 }
 
@@ -69,6 +67,7 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	// todo
 	m.textarea, cmd = m.textarea.Update(msg)
+	m.dialog, cmd = m.dialog.Update(msg)
 
 	return m, tea.Batch(cmd)
 }
@@ -94,8 +93,8 @@ func (m *Model) SetUser(id string) {
 }
 
 func (m *Model) Focus() {
-	m.dialog.Focus()
 	m.Focused = constant.DialogPanel
+	m.dialog.Focus()
 }
 
 func (m *Model) Blur() {

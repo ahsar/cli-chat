@@ -7,9 +7,9 @@ const (
 
 	RencentPanel byte = 0b100
 
-	ContactPanel byte = 0b001
-
 	DialogPanel byte = 0b010
+
+	ContactPanel byte = 0b001
 )
 
 var (

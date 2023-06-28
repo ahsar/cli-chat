@@ -1,4 +1,4 @@
-// user's contacts
+// Package contacts show user's contacts
 package contacts
 
 import (
@@ -33,7 +33,7 @@ func NewModel() Model {
 	}
 }
 
-func (m Model) Init() (t tea.Cmd) {
+func (m *Model) Init() (t tea.Cmd) {
 	return
 }
 

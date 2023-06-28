@@ -1,19 +1,11 @@
 package ui
 
 import (
-	"log"
-
 	"github.com/ahsar/cli-chat/internal/ui/constant"
 	"github.com/charmbracelet/bubbles/table"
 )
 
 func (m *model) sizeInput() {
-	log.Printf(
-		"resize h:%d w:%d",
-		m.height,
-		m.width,
-	)
-
 	m.rencent.SetSize(
 		m.width/3,
 		m.height-constant.HelpHeight-3)

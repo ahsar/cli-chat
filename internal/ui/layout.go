@@ -24,12 +24,11 @@ type keymap struct {
 type model struct {
 	rencent  rencent.Model
 	contacts contacts.Model
-	//dialog   dialog.Model
-	message message.Model
-	width   int
-	height  int
-	keymap  keymap
-	help    help.Model
+	message  *message.Model
+	width    int
+	height   int
+	keymap   keymap
+	help     help.Model
 }
 
 func NewModel() (m model) {
@@ -83,7 +82,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.keymap.prev):
 			//todo
 		case key.Matches(msg, m.keymap.enter):
-			log.Println("ui layout enter")
+			//log.Println("ui layout enter")
 			//todo
 		}
 	case tea.WindowSizeMsg:
@@ -119,7 +118,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	help := m.help.ShortHelpView([]key.Binding{
+	helpinfo := m.help.ShortHelpView([]key.Binding{
 		m.keymap.next,
 		m.keymap.prev,
 		m.keymap.quit,
@@ -135,7 +134,7 @@ func (m model) View() string {
 			m.message.View(),
 			m.contacts.View(),
 		))
-	buff.WriteString("\n\n" + help)
+	buff.WriteString("\n\n" + helpinfo)
 
 	// Render
 	lipgloss.NewStyle().

@@ -2,8 +2,6 @@
 package rencent
 
 import (
-	"log"
-
 	"github.com/ahsar/cli-chat/internal/ui/constant"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textarea"
@@ -40,9 +38,6 @@ func (m Model) Init() (t tea.Cmd) {
 }
 
 func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	log.Println("rencent focus msg", msg)
-	log.Println("rencent focus", m.textarea.Focused())
-	log.Println("rencent value", m.textarea.Value())
 	var cmd tea.Cmd
 	m.textarea, cmd = m.textarea.Update(msg)
 	return m, tea.Batch(cmd)

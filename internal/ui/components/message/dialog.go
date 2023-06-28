@@ -2,21 +2,19 @@
 package message
 
 import (
-	"log"
-
 	"github.com/ahsar/cli-chat/internal/ui/constant"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textarea"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-var Dialog DialogModel
+var Dialog *DialogModel
 
 type DialogModel struct {
 	textarea textarea.Model
 }
 
-func NewDialogModel() DialogModel {
+func NewDialogModel() *DialogModel {
 	t := textarea.New()
 	t.Prompt = ""
 	t.ShowLineNumbers = true
@@ -32,7 +30,7 @@ func NewDialogModel() DialogModel {
 	t.KeyMap.LineNext = key.NewBinding(key.WithKeys("down"))
 	t.KeyMap.LinePrevious = key.NewBinding(key.WithKeys("up"))
 	t.Blur()
-	Dialog = DialogModel{textarea: t}
+	Dialog = &DialogModel{textarea: t}
 	return Dialog
 }
 
@@ -40,9 +38,8 @@ func (m DialogModel) Init() (t tea.Cmd) {
 	return
 }
 
-func (m *DialogModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *DialogModel) Update(msg tea.Msg) (*DialogModel, tea.Cmd) {
 	var cmd tea.Cmd
-	log.Println("dialog update")
 	m.textarea, cmd = m.textarea.Update(msg)
 	return m, tea.Batch(cmd)
 }
@@ -57,8 +54,6 @@ func (m *DialogModel) View() (s string) {
 }
 
 func (m *DialogModel) Focus() {
-	log.Println("------dialog focus")
-	m.textarea.SetValue("----qwe2---------")
 	m.textarea.Focus()
 }
 
