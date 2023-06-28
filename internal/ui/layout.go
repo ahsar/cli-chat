@@ -3,12 +3,11 @@ package ui
 import (
 	"bytes"
 
-	"github.com/charmbracelet/log"
+	"log"
 
 	"github.com/ahsar/cli-chat/internal/ui/components/contacts"
 	"github.com/ahsar/cli-chat/internal/ui/constant"
 
-	//"github.com/ahsar/cli-chat/internal/ui/components/dialog"
 	"github.com/ahsar/cli-chat/internal/ui/components/message"
 	"github.com/ahsar/cli-chat/internal/ui/components/rencent"
 	"github.com/charmbracelet/bubbles/help"
@@ -33,7 +32,7 @@ type model struct {
 }
 
 func NewModel() (m model) {
-	log.Info("new ui model")
+	log.Println("new ui model")
 
 	m = model{
 		help: help.New(),
