@@ -7,7 +7,6 @@ require (
 	github.com/charmbracelet/bubbletea v0.24.1
 	github.com/charmbracelet/lipgloss v0.7.1
 	github.com/eatmoreapple/openwechat v1.4.2
-	github.com/liushuochen/gotable v0.0.0-20221119160816-1113793e7092
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 )
 

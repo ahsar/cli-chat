@@ -1,12 +1,7 @@
 package chat
 
 import (
-	"fmt"
-	"strconv"
-
 	"log"
-
-	"github.com/liushuochen/gotable"
 )
 
 func Groups() {
@@ -17,15 +12,12 @@ func Groups() {
 		return
 	}
 
-	table, err := gotable.Create("id", "群组名")
 	for i, fr := range groups {
 		name := fr.NickName
 		if fr.RemarkName != "" {
 			name = fr.RemarkName
 		}
 
-		table.AddRow([]string{strconv.Itoa(i), name})
+		log.Println("groups", i, name)
 	}
-
-	fmt.Println(table)
 }

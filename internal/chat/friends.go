@@ -35,7 +35,9 @@ func Friends() (s [][]string) {
 
 func TalkToId(i int, s string) {
 	u := friendsMap[i]
-	u.SendText(s)
+	if _, e := u.SendText(s); e != nil {
+		log.Println("talk to id err", e)
+	}
 }
 
 func FriendById(i int) *openwechat.Friend {
