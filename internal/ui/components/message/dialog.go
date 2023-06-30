@@ -4,8 +4,10 @@ package message
 import (
 	"log"
 	"strconv"
+	"strings"
 
 	"github.com/ahsar/cli-chat/internal/chat"
+	"github.com/ahsar/cli-chat/internal/record"
 	"github.com/ahsar/cli-chat/internal/ui/constant"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textarea"
@@ -69,14 +71,7 @@ func (m *DialogModel) Update(msg tea.Msg) (*DialogModel, tea.Cmd) {
 		switch {
 		case key.Matches(msg, m.keymap.send):
 			if txt := m.textarea.Value(); txt != "" {
-				// 1. send content to vx
-				chat.TalkToId(m.user.id, txt)
-
-				// 2. send content to message panel
-				Msg.SetText("", "我", txt)
-
-				// 3. clear dialog panel input
-				m.ClearInput()
+				m.send(txt)
 			}
 
 		case key.Matches(msg, m.keymap.esc):
@@ -109,8 +104,32 @@ func (m *DialogModel) Blur() {
 func (m *DialogModel) ClearInput() {
 	m.textarea.SetValue("")
 }
+
 func (m *DialogModel) SetUser(id string) {
 	i, _ := strconv.Atoi(id)
 	m.user.id = i
 	m.user.wid = chat.FriendById(i).ID()
+
+	// 渲染历史记录
+	r := record.HistoricalById(m.user.wid)
+	if len(r) <= 0 {
+		return
+	}
+
+	var b strings.Builder
+	for _, v := range r {
+		b.WriteString(v)
+	}
+	Msg.SetText("", "", b.String())
+}
+
+func (m *DialogModel) send(txt string) {
+	// 1. send content to vx
+	chat.TalkToId(m.user.id, txt)
+
+	// 2. send content to message panel
+	Msg.SetText("", "我", txt)
+
+	// 3. clear dialog panel input
+	m.ClearInput()
 }
