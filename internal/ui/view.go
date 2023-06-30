@@ -1,8 +1,12 @@
 package ui
 
 import (
+	"log"
+
+	"github.com/ahsar/cli-chat/internal/chat"
 	"github.com/ahsar/cli-chat/internal/ui/constant"
 	"github.com/charmbracelet/bubbles/table"
+	"github.com/eatmoreapple/openwechat"
 )
 
 func (m *model) sizeInput() {
@@ -21,9 +25,6 @@ func (m *model) exit() {
 	m.contacts.Blur()
 	m.rencent.Blur()
 	m.message.Blur()
-
-	// TODO
-	//chat.Logout()
 }
 
 func (m *model) getCurrent() (b byte) {
@@ -57,7 +58,7 @@ func (m *model) SetContacts() {
 		{"3", "z"},
 		{"4", "t"},
 	}
-	//frList := chat.Friends()
+	frList = chat.Friends()
 	l := len(frList)
 	if l <= 0 {
 		return
@@ -68,4 +69,17 @@ func (m *model) SetContacts() {
 		rows = append(rows, v)
 	}
 	m.contacts.SetRow(rows)
+}
+
+func (m *model) onMsg(msg *openwechat.Message) {
+	u, err := msg.Sender()
+	if err != nil {
+		log.Println("err get msg send", err)
+	}
+	content := msg.Content
+	if !msg.IsText() {
+		content = "[" + msg.MsgType.String() + "], 暂不支持在终端查看, 请前往手机查看"
+	}
+
+	m.message.SetText(u.ID(), chat.GetName(u), content)
 }

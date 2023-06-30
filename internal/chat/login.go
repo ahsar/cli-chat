@@ -8,17 +8,20 @@ import (
 )
 
 var (
-	bot  *openwechat.Bot
-	self *openwechat.Self
-	err  error
+	bot   *openwechat.Bot
+	self  *openwechat.Self
+	msgch chan *openwechat.Message
+	err   error
 )
 
 // 登录wechat
-func Login() {
+func Init(ch chan *openwechat.Message) {
 	log.Println("now login")
 	if bot != nil && bot.Alive() {
 		return
 	}
+	msgch = ch
+
 	bot = openwechat.DefaultBot(openwechat.Desktop) // 桌面模式
 
 	// 注册登陆二维码回调
@@ -32,11 +35,7 @@ func Login() {
 	}
 
 	// 注册消息处理函数
-	//bot.MessageHandler = func(msg *openwechat.Message) {
-	//if msg.IsText() && msg.Content == "ping" {
-	//msg.ReplyText("pong")
-	//}
-	//}
+	bot.MessageHandler = messageHandler
 
 	// 获取登陆的用户
 	self, err = bot.GetCurrentUser()
@@ -45,11 +44,15 @@ func Login() {
 		return
 	}
 
+	bot.MessageHandler = messageHandler
 	// 阻塞主goroutine, 直到发生异常或者用户主动退出
 	//go bot.Block()
 }
 
 func Logout() {
+	if bot == nil || !bot.Alive() {
+		return
+	}
 	bot.Logout()
 }
 

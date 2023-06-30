@@ -7,6 +7,7 @@ import (
 
 	"github.com/ahsar/cli-chat/internal/ui/components/contacts"
 	"github.com/ahsar/cli-chat/internal/ui/constant"
+	"github.com/eatmoreapple/openwechat"
 
 	"github.com/ahsar/cli-chat/internal/ui/components/message"
 	"github.com/ahsar/cli-chat/internal/ui/components/rencent"
@@ -18,7 +19,7 @@ import (
 )
 
 type keymap struct {
-	next, quit, enter key.Binding
+	next, quit, enter, send key.Binding
 }
 
 type model struct {
@@ -29,9 +30,10 @@ type model struct {
 	height   int
 	keymap   keymap
 	help     help.Model
+	msgch    chan *openwechat.Message
 }
 
-func NewModel() (m model) {
+func NewModel(ch chan *openwechat.Message) (m model) {
 	log.Println("new ui model")
 
 	m = model{
@@ -47,16 +49,23 @@ func NewModel() (m model) {
 			),
 			enter: key.NewBinding(
 				key.WithKeys("enter"),
-				key.WithHelp("enter", "send or select"),
+				key.WithHelp("enter", "选择联系人"),
+			),
+			send: key.NewBinding(
+				key.WithKeys("ctrl+s"),
+				key.WithHelp("ctrl+s", "发送消息"),
 			),
 		},
 		rencent:  rencent.NewModel(),
 		message:  message.NewModel(),
 		contacts: contacts.NewModel(),
+		msgch:    ch,
 	}
 
 	m.contacts.Focus()
 	m.SetContacts()
+	go m.consumer()
+
 	return
 }
 
@@ -75,7 +84,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		case key.Matches(msg, m.keymap.next):
 			m.focusInTurn()
-		case key.Matches(msg, m.keymap.enter):
+			//case key.Matches(msg, m.keymap.enter):
 			//log.Println("ui layout enter")
 			//todo
 		}
@@ -100,7 +109,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds = append(cmds, cmd)
 		m.keymap.enter = key.NewBinding(
 			key.WithKeys("enter"),
-			key.WithHelp("enter", "enter 发送消息"),
+			key.WithHelp("enter", "ctrl+enter 发送消息"),
 		)
 
 	case i & constant.DialogPanel:
@@ -116,6 +125,7 @@ func (m model) View() string {
 		m.keymap.next,
 		m.keymap.quit,
 		m.keymap.enter,
+		m.keymap.send,
 	})
 
 	// Panels
@@ -140,4 +150,10 @@ func (m model) View() string {
 		Render(buff.String())
 
 	return buff.String()
+}
+
+func (m *model) consumer() {
+	for v := range m.msgch {
+		m.onMsg(v)
+	}
 }

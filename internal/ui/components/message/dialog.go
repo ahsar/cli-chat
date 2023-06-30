@@ -17,7 +17,8 @@ type keymap struct {
 }
 
 type user struct {
-	id int
+	id  int
+	wid string // vx id
 }
 
 type DialogModel struct {
@@ -30,7 +31,7 @@ func NewDialogModel() *DialogModel {
 	t := textarea.New()
 	t.Prompt = ""
 	t.ShowLineNumbers = true
-	t.Placeholder = "Press ENTER to send"
+	t.Placeholder = "Press Ctrl+enter to send"
 	t.Cursor.Style = constant.CursorStyle
 	t.FocusedStyle.Placeholder = constant.FocusedPlaceholderStyle
 	t.BlurredStyle.Placeholder = constant.PlaceholderStyle
@@ -67,15 +68,16 @@ func (m *DialogModel) Update(msg tea.Msg) (*DialogModel, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, m.keymap.send):
-			txt := m.textarea.Value()
-			// 1. send content to vx
-			chat.TalkToId(m.user.id, txt)
+			if txt := m.textarea.Value(); txt != "" {
+				// 1. send content to vx
+				chat.TalkToId(m.user.id, txt)
 
-			// 2. send content to message panel
-			Msg.SetMyTxt(txt)
+				// 2. send content to message panel
+				Msg.SetText("", "我", txt)
 
-			// 3. clear dialog panel input
-			m.ClearInput()
+				// 3. clear dialog panel input
+				m.ClearInput()
+			}
 
 		case key.Matches(msg, m.keymap.esc):
 			log.Println("exit dialog panel")
@@ -110,4 +112,5 @@ func (m *DialogModel) ClearInput() {
 func (m *DialogModel) SetUser(id string) {
 	i, _ := strconv.Atoi(id)
 	m.user.id = i
+	m.user.wid = chat.FriendById(i).ID()
 }

@@ -25,11 +25,7 @@ func Friends() (s [][]string) {
 	friendsMap = make([]*openwechat.Friend, l)
 
 	for i, fr := range friends {
-		name := fr.NickName
-		if fr.RemarkName != "" {
-			name = fr.RemarkName
-		}
-
+		name := GetName(fr.User)
 		friendsMap[i] = fr
 		s = append(s, []string{strconv.Itoa(i), name})
 	}
@@ -38,12 +34,18 @@ func Friends() (s [][]string) {
 }
 
 func TalkToId(i int, s string) {
-	// TODO
-	if true {
-		log.Printf("send %s to %d\n", s, i)
-		return
-	}
-
 	u := friendsMap[i]
 	u.SendText(s)
+}
+
+func FriendById(i int) *openwechat.Friend {
+	return friendsMap[i]
+}
+
+func GetName(u *openwechat.User) (s string) {
+	s = u.NickName
+	if u.RemarkName != "" {
+		s = u.RemarkName
+	}
+	return
 }

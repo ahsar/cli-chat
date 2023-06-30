@@ -4,6 +4,8 @@ package message
 import (
 	//"github.com/ahsar/cli-chat/internal/ui/components/dialog"
 
+	"strings"
+
 	"github.com/ahsar/cli-chat/internal/ui/constant"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textarea"
@@ -72,6 +74,10 @@ func (m *Model) View() (s string) {
 }
 
 func (m *Model) SetUser(id string) {
+	// 清屏
+	// todo 渲染对话容器
+	m.Reset()
+
 	m.dialog.SetUser(id)
 	m.Focus()
 }
@@ -86,17 +92,34 @@ func (m *Model) Blur() {
 	m.dialog.Blur()
 }
 
-// SetMyTxt
+// SetText
 //
 // 显示我的回复信息
-func (m *Model) SetMyTxt(s string) {
-	m.textarea.InsertString("(我): " + s + "\n")
+// TODO 每个人一个对话容器
+func (m *Model) SetText(id, nick, s string) {
+	// 消息人是当前对话窗口联系人
+	if id != "" && id != m.dialog.user.wid {
+		return
+	}
+
+	var b strings.Builder
+	b.WriteString("(")
+	b.WriteString(nick)
+	b.WriteString("): ")
+	b.WriteString(s)
+	b.WriteString("\n")
+
+	m.textarea.InsertString(b.String())
 	// cursor down didn't work ?
 	//m.textarea.CursorEnd()
 	//m.textarea.CursorDown()
 
 	// textarea can't cursor down
 	if m.textarea.Line() >= m.textarea.Height() {
-		m.textarea.Reset()
+		m.Reset()
 	}
+}
+
+func (m *Model) Reset() {
+	m.textarea.Reset()
 }
