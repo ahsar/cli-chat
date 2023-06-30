@@ -94,6 +94,7 @@ func (m *Model) Blur() {
 // SetText
 //
 // 显示我的回复信息
+// id means vxid
 func (m *Model) SetText(id, nick, s string) {
 	// 消息人是当前对话窗口联系人
 	if id != "" && id != m.dialog.user.wid {

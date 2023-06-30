@@ -128,7 +128,7 @@ func (m *DialogModel) send(txt string) {
 	chat.TalkToId(m.user.id, txt)
 
 	// 2. send content to message panel
-	Msg.SetText("", "我", txt)
+	Msg.SetText(m.user.wid, "我", txt)
 
 	// 3. clear dialog panel input
 	m.ClearInput()
