@@ -2,8 +2,6 @@
 package message
 
 import (
-	//"github.com/ahsar/cli-chat/internal/ui/components/dialog"
-
 	"strings"
 
 	"github.com/ahsar/cli-chat/internal/record"
@@ -113,7 +111,7 @@ func (m *Model) SetText(id, nick, s string) {
 	txt := b.String()
 	m.textarea.InsertString(txt)
 	record.SetTxtById(id, txt)
-	// cursor down didn't work ?
+	//TODO cursor down didn't work ?
 	//m.textarea.CursorEnd()
 	//m.textarea.CursorDown()
 

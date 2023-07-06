@@ -1,6 +1,7 @@
 package chat
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/eatmoreapple/openwechat"
@@ -45,8 +46,11 @@ func Init(ch chan *openwechat.Message) {
 	}
 
 	bot.MessageHandler = messageHandler
-	// 阻塞主goroutine, 直到发生异常或者用户主动退出
-	//go bot.Block()
+	go func() {
+		if r := bot.Block(); r != nil {
+			fmt.Println("wechat 已退出", r)
+		}
+	}()
 }
 
 func Logout() {
@@ -58,5 +62,5 @@ func Logout() {
 
 func consoleQrCode(uuid string) {
 	q, _ := qrcode.New("https://login.weixin.qq.com/l/"+uuid, qrcode.Low)
-	log.Println(q.ToString(true))
+	fmt.Println(q.ToString(true))
 }
