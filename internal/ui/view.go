@@ -30,7 +30,7 @@ func (m *model) exit() {
 func (m *model) getCurrent() (b byte) {
 	return m.contacts.Focused |
 		m.message.Focused |
-		m.rencent.Focused
+		m.rencent.Focused()
 }
 
 func (m *model) focusInTurn() {
@@ -51,7 +51,14 @@ func (m *model) focusInTurn() {
 
 // 设定通讯录
 func (m *model) SetContacts() {
-	frList := chat.Friends()
+	var frList [][]string
+	frList = chat.Friends()
+	//todo
+	//frList = [][]string{
+	//{"1", "xj"},
+	//{"2", "zln"},
+	//{"3", "sp"},
+	//}
 	l := len(frList)
 	if l <= 0 {
 		return

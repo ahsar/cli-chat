@@ -23,7 +23,7 @@ type keymap struct {
 }
 
 type model struct {
-	rencent  rencent.Model
+	rencent  rencent.Rencent
 	contacts contacts.Model
 	message  *message.Model
 	width    int
@@ -56,7 +56,7 @@ func NewModel(ch chan *openwechat.Message) (m model) {
 				key.WithHelp("ctrl+s", "发送消息"),
 			),
 		},
-		rencent:  rencent.NewModel(),
+		rencent:  rencent.NewList(),
 		message:  message.NewModel(),
 		contacts: contacts.NewModel(),
 		msgch:    ch,

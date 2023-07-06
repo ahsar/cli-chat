@@ -5,6 +5,7 @@ import (
 	"github.com/ahsar/cli-chat/internal/ui/constant"
 
 	"github.com/ahsar/cli-chat/internal/ui/components/message"
+	"github.com/ahsar/cli-chat/internal/ui/components/rencent"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
@@ -47,7 +48,10 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			// 1. register message user
 			message.Msg.SetUser(m.table.SelectedRow()[0])
 
-			// 2. blur current panel
+			// 2. add to rencent contacts
+			rencent.Obj.AddUser(m.table.SelectedRow()[0])
+
+			// 3. blur current panel
 			m.Blur()
 		}
 	}
