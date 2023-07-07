@@ -16,6 +16,6 @@ type Rencent interface {
 	Blur()
 	Focused() byte
 	SetItems(any)
-	AddUser(string)
-	//SetUserMsg(i, j string)
+	AddUser(i, msg string)
+	SetUserMsg(i, j string)
 }

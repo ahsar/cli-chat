@@ -19,7 +19,7 @@ func Run() {
 
 	// chat init
 	// 接收微信通知消息
-	ch := make(chan *openwechat.Message, 1)
+	ch := make(chan *openwechat.Message)
 	chat.Init(ch)
 
 	// record init

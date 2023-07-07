@@ -49,7 +49,7 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			message.Msg.SetUser(m.table.SelectedRow()[0])
 
 			// 2. add to rencent contacts
-			rencent.Obj.AddUser(m.table.SelectedRow()[0])
+			rencent.Obj.AddUser(m.table.SelectedRow()[0], "")
 
 			// 3. blur current panel
 			m.Blur()

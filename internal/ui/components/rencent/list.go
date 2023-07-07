@@ -14,29 +14,30 @@ import (
 
 var docStyle = lipgloss.NewStyle().Margin(1, 2)
 
-type item struct {
-	// id means local id, not vxid
-	id, msg, uname string
-}
+type (
+	item struct {
+		// id means local id, not vxid
+		id, msg, uname string
+	}
 
-type keymap struct {
-	enter key.Binding
-}
+	keymap struct {
+		enter key.Binding
+	}
+
+	listModel struct {
+		items   []item
+		list    list.Model
+		keymap  keymap
+		focused byte
+		uMap    map[string]int // 记录local user id in rencent list index
+	}
+)
 
 func (i item) Title() string       { return i.uname }
 func (i item) Description() string { return i.msg }
 func (i item) FilterValue() string { return i.msg }
 
-type listModel struct {
-	items   []item
-	list    list.Model
-	keymap  keymap
-	focused byte
-	uMap    map[string]int // uid:index
-}
-
 func NewList() (m *listModel) {
-	// TODO read from storage file
 	m = &listModel{
 		list: list.New([]list.Item{}, list.NewDefaultDelegate(), 170, 40),
 		keymap: keymap{
@@ -117,14 +118,21 @@ func (m *listModel) Focused() byte {
 // 添加联系人
 // 不存在: add
 // 存在: set to top
-func (m *listModel) AddUser(id string) {
+// id means local id
+func (m *listModel) AddUser(id, msg string) {
 	if v, ok := m.uMap[id]; ok {
-		// 索引交换
-		m.uMap[id] = 0
-		m.uMap[m.items[0].id] = v
+		newest := m.items[v]
+		l := len(m.items)
 
-		// 数组交换
-		m.items[0], m.items[v] = m.items[v], m.items[0]
+		if l-1 != v {
+			for i := v; i < l-1; i++ {
+				m.items[i] = m.items[i+1]
+				m.uMap[m.items[i].id] = i + 1
+			}
+		}
+		newest.msg = msg
+		m.items[l-1] = newest
+		m.uMap[id] = l - 1
 	} else {
 		i, _ := strconv.Atoi(id)
 		n := chat.GetName(chat.FriendById(i).User)
@@ -135,6 +143,7 @@ func (m *listModel) AddUser(id string) {
 		m.addItem(item{
 			id:    id,
 			uname: n,
+			msg:   msg,
 		})
 		return
 	}
@@ -142,7 +151,9 @@ func (m *listModel) AddUser(id string) {
 	m.render(m.items)
 }
 
-// todo
+// SetItems todo
+//
+// 初始化最近联系人
 func (m *listModel) SetItems(i any) {
 	x, ok := i.([]list.Item)
 	if !ok {
@@ -159,16 +170,18 @@ func (m *listModel) SetItems(i any) {
 	m.list.SetItems(x)
 }
 
+// 新增元素
+// 逆序插入, 减少数组头部插入, 元素移动
 func (m *listModel) addItem(i item) {
 	m.items = append(m.items, i)
+	m.uMap[i.id] = len(m.items) - 1
 	m.list.InsertItem(0, i)
 }
 
 func (m *listModel) render(i []item) {
 	items := make([]list.Item, 0, len(i))
-
-	for _, v := range i {
-		items = append(items, v)
+	for i := len(m.items) - 1; i >= 0; i-- {
+		items = append(items, m.items[i])
 	}
 
 	m.list.SetItems(items)
@@ -176,15 +189,12 @@ func (m *listModel) render(i []item) {
 
 // SetUserMsg
 // 设定用户最后聊天文字
+// id means vxid
 func (m *listModel) SetUserMsg(id, msg string) {
-	var (
-		v  int
-		ok bool
-	)
-	if v, ok = m.uMap[id]; !ok {
+	i := chat.ConverVxid2Id(id)
+	if i < 0 {
 		return
 	}
 
-	m.items[v].msg = msg
-	m.render(m.items)
+	m.AddUser(strconv.Itoa(i), msg)
 }

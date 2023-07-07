@@ -12,7 +12,9 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-var Msg *Model
+var (
+	Msg *Model
+)
 
 type Model struct {
 	dialog   *DialogModel
@@ -110,10 +112,14 @@ func (m *Model) SetText(id, nick, s string) {
 
 	txt := b.String()
 	m.textarea.InsertString(txt)
+	// 历史聊天记录
 	record.SetTxtById(id, txt)
 	//TODO cursor down didn't work ?
-	//m.textarea.CursorEnd()
+	//m.textarea.Focus()
+	//m.textarea.CursorStart()
+	//m.textarea.Blur()
 	//m.textarea.CursorDown()
+	//m.Update(updateMsg)
 
 	// textarea can't cursor down
 	if m.textarea.Line() >= m.textarea.Height() {

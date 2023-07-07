@@ -8,7 +8,12 @@ import (
 	"log"
 )
 
-var friendsMap []*openwechat.Friend
+var (
+	friendsMap []*openwechat.Friend
+
+	// 内部id 转vxid
+	friendsIdMap = make(map[string]int)
+)
 
 // Friends
 // 获取账号下所有好友
@@ -27,6 +32,7 @@ func Friends() (s [][]string) {
 	for i, fr := range friends {
 		name := GetName(fr.User)
 		friendsMap[i] = fr
+		friendsIdMap[fr.ID()] = i
 		s = append(s, []string{strconv.Itoa(i), name})
 	}
 
@@ -42,6 +48,17 @@ func TalkToId(i int, s string) {
 
 func FriendById(i int) *openwechat.Friend {
 	return friendsMap[i]
+}
+
+// ConverVxid2Id
+//
+// conver vxid 2 local id
+func ConverVxid2Id(i string) int {
+	x, ok := friendsIdMap[i]
+	if !ok {
+		x = -1
+	}
+	return x
 }
 
 func GetName(u *openwechat.User) (s string) {

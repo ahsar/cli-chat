@@ -73,5 +73,7 @@ func (m *tableModel) Focused() byte {
 func (m *tableModel) SetItems(any) {
 }
 
-func (m *tableModel) AddUser(string) {
+func (m *tableModel) AddUser(i, j string) {
+}
+func (m *tableModel) SetUserMsg(i, j string) {
 }

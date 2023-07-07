@@ -73,13 +73,19 @@ func (m *model) SetContacts() {
 
 func (m *model) onMsg(msg *openwechat.Message) {
 	u, err := msg.Sender()
-	if err != nil {
-		log.Println("err get msg send", err)
+	if err != nil || !u.IsFriend() {
+		log.Println(
+			"暂不支持非通讯录好友类型信息 msg sender err",
+			err)
 	}
+
 	content := msg.Content
 	if !msg.IsText() {
 		content = "[" + msg.MsgType.String() + "], 暂不支持在终端查看, 请前往手机查看"
 	}
 
 	m.message.SetText(u.ID(), chat.GetName(u), content)
+
+	// 渲染最近联系人消息
+	m.rencent.SetUserMsg(u.ID(), content)
 }

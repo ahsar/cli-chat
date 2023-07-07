@@ -102,19 +102,21 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds = append(cmds, cmd)
 		m.keymap.enter = key.NewBinding(
 			key.WithKeys("enter"),
-			key.WithHelp("enter", "enter 选择联系人"))
+			key.WithHelp("通讯录", "enter 选择联系人"))
 
 	case i & constant.RencentPanel:
 		_, cmd = m.rencent.Update(msg)
 		cmds = append(cmds, cmd)
 		m.keymap.enter = key.NewBinding(
 			key.WithKeys("enter"),
-			key.WithHelp("enter", "ctrl+enter 发送消息"),
-		)
+			key.WithHelp("最近联系的人", "enter 选择联系人"))
 
 	case i & constant.DialogPanel:
 		_, cmd = m.message.Update(msg)
 		cmds = append(cmds, cmd)
+		m.keymap.enter = key.NewBinding(
+			key.WithKeys("enter"),
+			key.WithHelp("输入框", "ctrl+enter 发送消息"))
 	}
 
 	return m, tea.Batch(cmds...)
